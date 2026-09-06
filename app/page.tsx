@@ -1,44 +1,135 @@
-const stack = ["Next.js", "React", "TypeScript", "Tailwind CSS", "shadcn/ui"];
+const courses = [
+  {
+    id: "01",
+    area: "ai engineering",
+    slug: "ai-assisted-development",
+    title: "AI-assisted software development",
+    description:
+      "Model-assisted workflows without giving up judgment, tests, or understanding.",
+    lessons: "08 lessons",
+    status: "writing",
+  },
+  {
+    id: "02",
+    area: "engineering",
+    slug: "practical-typescript",
+    title: "Practical TypeScript",
+    description:
+      "Use the type system to make application code easier to change.",
+    lessons: "06 lessons",
+    status: "queued",
+  },
+  {
+    id: "03",
+    area: "frontend",
+    slug: "interfaces-with-intent",
+    title: "Interfaces with intent",
+    description:
+      "Build web interfaces that are clear, fast, and difficult to misuse.",
+    lessons: "07 lessons",
+    status: "queued",
+  },
+] as const;
 
 export default function Home() {
   return (
-    <main className="min-h-svh bg-background px-6 py-8 text-foreground sm:px-10 sm:py-10">
-      <div className="mx-auto flex min-h-[calc(100svh-4rem)] max-w-6xl flex-col sm:min-h-[calc(100svh-5rem)]">
-        <header className="flex items-center justify-between border-b pb-5">
-          <p className="text-sm font-semibold tracking-tight">learn.smmeyer.dev</p>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span
-              className="size-1.5 rounded-full bg-emerald-500"
-              aria-hidden="true"
-            />
-            Scaffold ready
-          </div>
+    <main className="min-h-svh bg-background text-foreground">
+      <div className="mx-auto min-h-svh max-w-6xl px-4 sm:px-6">
+        <header className="flex h-14 items-center justify-between border-b font-mono text-xs">
+          <p className="font-medium text-foreground">
+            learn.smmeyer.dev<span className="text-primary">/</span>
+          </p>
+          <a
+            href="https://smmeyer.dev"
+            className="text-muted-foreground underline decoration-border underline-offset-4 transition-colors hover:text-foreground"
+          >
+            smmeyer.dev ↗
+          </a>
         </header>
 
-        <section className="flex flex-1 flex-col justify-center py-20">
-          <p className="mb-6 font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground">
-            Learning, built in public
-          </p>
-          <h1 className="max-w-4xl text-5xl font-semibold tracking-[-0.045em] text-balance sm:text-7xl lg:text-8xl">
-            A home for practical technology courses.
-          </h1>
-          <p className="mt-8 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">
-            The foundation is in place. Course browsing, lessons, and local
-            progress tracking come next.
-          </p>
-        </section>
+        <div className="grid gap-12 py-10 sm:py-14 lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-20">
+          <aside className="lg:sticky lg:top-14 lg:self-start">
+            <p className="font-mono text-xs text-primary">index / 001</p>
+            <h1 className="mt-5 text-4xl font-medium tracking-[-0.045em]">
+              courses
+            </h1>
+            <p className="mt-4 max-w-xs text-sm leading-6 text-muted-foreground">
+              Compact technical courses. Written as working notes, edited into
+              a path.
+            </p>
 
-        <footer className="flex flex-col gap-4 border-t pt-5 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <p>Frontend-only by design.</p>
-          <ul
-            className="flex flex-wrap gap-x-4 gap-y-2"
-            aria-label="Technology stack"
-          >
-            {stack.map((technology) => (
-              <li key={technology}>{technology}</li>
-            ))}
-          </ul>
-        </footer>
+            <dl className="mt-9 border-t font-mono text-[0.6875rem] leading-5">
+              <div className="grid grid-cols-2 border-b py-2.5">
+                <dt className="text-muted-foreground">format</dt>
+                <dd>self-paced</dd>
+              </div>
+              <div className="grid grid-cols-2 border-b py-2.5">
+                <dt className="text-muted-foreground">progress</dt>
+                <dd>local only</dd>
+              </div>
+              <div className="grid grid-cols-2 border-b py-2.5">
+                <dt className="text-muted-foreground">account</dt>
+                <dd>none</dd>
+              </div>
+            </dl>
+          </aside>
+
+          <section aria-labelledby="course-index">
+            <div className="flex items-baseline justify-between border-b pb-3 font-mono text-xs">
+              <h2 id="course-index">course index</h2>
+              <p className="text-muted-foreground">
+                {String(courses.length).padStart(2, "0")} entries
+              </p>
+            </div>
+
+            <ol>
+              {courses.map((course) => (
+                <li
+                  key={course.id}
+                  className="grid grid-cols-[1.75rem_minmax(0,1fr)] gap-x-4 border-b py-7 sm:grid-cols-[2rem_minmax(0,1fr)_6.5rem] sm:gap-x-6 sm:py-8"
+                >
+                  <p className="font-mono text-xs tabular-nums text-muted-foreground">
+                    {course.id}
+                  </p>
+
+                  <article>
+                    <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[0.6875rem]">
+                      <p className="text-muted-foreground">/{course.slug}</p>
+                      <span className="text-border" aria-hidden="true">
+                        {"//"}
+                      </span>
+                      <p>{course.area}</p>
+                    </div>
+                    <h3 className="text-xl font-medium tracking-[-0.025em] sm:text-2xl">
+                      {course.title}
+                    </h3>
+                    <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
+                      {course.description}
+                    </p>
+                  </article>
+
+                  <div className="col-start-2 mt-5 flex items-center justify-between font-mono text-[0.6875rem] sm:col-start-auto sm:mt-0 sm:flex-col sm:items-end">
+                    <p
+                      className={
+                        course.status === "writing"
+                          ? "text-primary"
+                          : "text-muted-foreground"
+                      }
+                    >
+                      [{course.status}]
+                    </p>
+                    <p className="text-muted-foreground">{course.lessons}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+
+            <footer className="flex flex-col gap-1.5 pt-5 font-mono text-[0.6875rem] text-muted-foreground sm:flex-row sm:justify-between">
+              <p>planned: progress → localStorage</p>
+              <p>network sync: none</p>
+            </footer>
+          </section>
+        </div>
       </div>
     </main>
   );

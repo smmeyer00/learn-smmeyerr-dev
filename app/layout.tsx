@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -13,15 +13,31 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Learn | Steven Meyer",
-  description: "Practical technology courses by Steven Meyer.",
+  metadataBase: new URL("https://learn.smmeyer.dev"),
+  title: "Courses | Learn",
+  description: "Compact technical courses and working notes by Steven Meyer.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Courses | Learn",
+    description: "Compact technical courses and working notes by Steven Meyer.",
+    url: "/",
+    siteName: "Learn",
+    type: "website",
+  },
+};
+
+export const viewport: Viewport = {
+  colorScheme: "dark",
+  themeColor: "#11100e",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`dark ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
