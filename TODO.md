@@ -71,9 +71,11 @@ alone; respect `prefers-reduced-motion`.
 
 ## 4. Field manual
 
-- [ ] `/field-manual` page: scale formulas, availability budgets, AI-system
-      metrics, 50-minute checklist, FACT frame (content is ready in handoff §7)
-- [ ] Print/PDF-friendly layout (also print-clean chapter pages)
+- [x] `/field-manual` page: scale formulas, availability budgets, AI-system
+      metrics, 50-minute checklist, FACT frame (content ported verbatim from
+      handoff §7; shared `SiteHeader` links it from every page)
+- [x] Print/PDF-friendly layout (also print-clean chapter pages) (global
+      `@media print`: light scheme, nav/controls hidden, `<details>` expanded)
 
 ## 5. Search & navigation
 

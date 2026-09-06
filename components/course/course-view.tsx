@@ -1,5 +1,6 @@
 import type { Course } from "@/content";
 import Link from "next/link";
+import { SiteHeader } from "@/components/site-header";
 import { ChapterStatus } from "@/components/progress/chapter-status";
 
 export function CourseView({ course }: { course: Course }) {
@@ -8,21 +9,7 @@ export function CourseView({ course }: { course: Course }) {
   return (
     <main id="main" className="min-h-svh bg-background text-foreground">
       <div className="mx-auto min-h-svh max-w-6xl px-4 sm:px-6">
-        <header className="flex h-14 items-center justify-between border-b font-mono text-xs">
-          <p className="font-medium text-foreground">
-            <Link href="/" className="underline decoration-border underline-offset-4 transition-colors hover:text-foreground">
-              learn.smmeyer.dev
-            </Link>
-            <span className="text-primary">/</span>
-            <span className="text-muted-foreground">{course.slug}</span>
-          </p>
-          <a
-            href="https://smmeyer.dev"
-            className="text-muted-foreground underline decoration-border underline-offset-4 transition-colors hover:text-foreground"
-          >
-            smmeyer.dev ↗
-          </a>
-        </header>
+        <SiteHeader trail={[{ label: course.slug }]} />
 
         <div className="grid gap-12 py-10 sm:py-14 lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-20">
           <aside className="lg:sticky lg:top-14 lg:self-start">

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { SiteHeader } from "@/components/site-header";
 import { glossary, slugifyTerm } from "@/content/glossary";
 
 export const metadata: Metadata = {
@@ -12,24 +13,7 @@ export default function GlossaryPage() {
   return (
     <main id="main" className="min-h-svh bg-background text-foreground">
       <div className="mx-auto min-h-svh max-w-6xl px-4 sm:px-6">
-        <header className="flex h-14 items-center justify-between border-b font-mono text-xs">
-          <p className="font-medium text-foreground">
-            <Link
-              href="/"
-              className="underline decoration-border underline-offset-4 transition-colors hover:text-foreground"
-            >
-              learn.smmeyer.dev
-            </Link>
-            <span className="text-primary">/</span>
-            <span className="text-muted-foreground">glossary</span>
-          </p>
-          <a
-            href="https://smmeyer.dev"
-            className="text-muted-foreground underline decoration-border underline-offset-4 transition-colors hover:text-foreground"
-          >
-            smmeyer.dev ↗
-          </a>
-        </header>
+        <SiteHeader trail={[{ label: "glossary" }]} />
 
         <div className="mx-auto max-w-3xl py-10 sm:py-14">
           <p className="font-mono text-xs text-primary">reference</p>

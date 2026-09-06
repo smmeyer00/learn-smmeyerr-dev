@@ -9,6 +9,7 @@
 import { courses } from "@/content";
 import { glossary, slugifyTerm } from "@/content/glossary";
 import { drillScenarios } from "@/content/drills";
+import { fieldManual } from "@/content/field-manual";
 
 export type SearchKind = "chapter" | "glossary" | "drill" | "manual";
 
@@ -64,6 +65,16 @@ export function buildSearchIndex(extra: SearchEntry[] = []): SearchEntry[] {
       detail: `${scenario.track} drill · ${scenario.focus}`,
       href: "/drills",
       text: `${scenario.title}\n${scenario.track}\n${scenario.focus}`.toLowerCase(),
+    });
+  }
+
+  for (const section of fieldManual) {
+    entries.push({
+      kind: "manual",
+      title: `field manual: ${section.title}`,
+      detail: section.intro,
+      href: `/field-manual#${section.id}`,
+      text: `${section.title}\n${section.intro}\n${section.rows.map((r) => `${r.label} ${r.value}`).join("\n")}`.toLowerCase(),
     });
   }
 

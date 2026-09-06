@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Chapter, Course } from "@/content";
 import { BookmarkButton } from "@/components/progress/bookmark-button";
 import { ChapterNotes } from "@/components/progress/chapter-notes";
+import { SiteHeader } from "@/components/site-header";
 import { LabHost } from "@/components/labs/host";
 import { labsForChapter } from "@/components/labs/registry";
 import { MarkComplete } from "@/components/progress/mark-complete";
@@ -63,30 +64,12 @@ export function ChapterView({
     <main id="main" className="min-h-svh bg-background text-foreground">
       <TrackVisit courseSlug={course.slug} chapterSlug={chapter.slug} />
       <div className="mx-auto min-h-svh max-w-6xl px-4 sm:px-6">
-        <header className="flex h-14 items-center justify-between border-b font-mono text-xs">
-          <p className="font-medium text-foreground">
-            <Link href="/" className="underline decoration-border underline-offset-4 transition-colors hover:text-foreground">
-              learn.smmeyer.dev
-            </Link>
-            <span className="text-primary">/</span>
-            <Link
-              href={`/${course.slug}`}
-              className="underline decoration-border underline-offset-4 transition-colors hover:text-foreground"
-            >
-              {course.slug}
-            </Link>
-            <span className="text-primary">/</span>
-            <span className="text-muted-foreground">
-              {String(chapter.order).padStart(2, "0")}
-            </span>
-          </p>
-          <a
-            href="https://smmeyer.dev"
-            className="text-muted-foreground underline decoration-border underline-offset-4 transition-colors hover:text-foreground"
-          >
-            smmeyer.dev ↗
-          </a>
-        </header>
+        <SiteHeader
+          trail={[
+            { label: course.slug, href: `/${course.slug}` },
+            { label: String(chapter.order).padStart(2, "0") },
+          ]}
+        />
 
         <div className="mx-auto max-w-3xl py-10 sm:py-14">
           {/* Chapter heading */}
