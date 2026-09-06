@@ -49,8 +49,9 @@ docs/
   system-design-llm-course-build-handoff.md  # canonical curriculum source
 ```
 
-All routes are statically generated via `generateStaticParams`; there are no
-client components and no runtime data fetching.
+All routes are statically generated via `generateStaticParams`; pages are
+server-rendered with small client islands for progress (`components/progress/`,
+localStorage only — see TODO §1 for what's left).
 
 ## Commands
 

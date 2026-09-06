@@ -1,5 +1,7 @@
 import Link from "next/link";
 import type { Chapter, Course } from "@/content";
+import { MarkComplete } from "@/components/progress/mark-complete";
+import { TrackVisit } from "@/components/progress/track-visit";
 
 function SectionLabel({ children }: { children: string }) {
   return (
@@ -54,6 +56,7 @@ export function ChapterView({
 
   return (
     <main className="min-h-svh bg-background text-foreground">
+      <TrackVisit courseSlug={course.slug} chapterSlug={chapter.slug} />
       <div className="mx-auto min-h-svh max-w-6xl px-4 sm:px-6">
         <header className="flex h-14 items-center justify-between border-b font-mono text-xs">
           <p className="font-medium text-foreground">
@@ -316,7 +319,13 @@ export function ChapterView({
 
           {/* Prev / next */}
           <nav className="mt-16 border-t pt-5">
-            <ul className="flex flex-col gap-3 font-mono text-xs sm:flex-row sm:justify-between">
+            <div className="flex items-center justify-between font-mono text-xs">
+              <MarkComplete courseSlug={course.slug} chapterSlug={chapter.slug} />
+              <p className="text-muted-foreground">
+                {String(chapter.order).padStart(2, "0")}/{String(course.chapters.length).padStart(2, "0")}
+              </p>
+            </div>
+            <ul className="mt-4 flex flex-col gap-3 font-mono text-xs sm:flex-row sm:justify-between">
               <li>
                 {prev ? (
                   <Link

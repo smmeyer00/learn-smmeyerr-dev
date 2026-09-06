@@ -1,5 +1,6 @@
 import type { Course } from "@/content";
 import Link from "next/link";
+import { ChapterStatus } from "@/components/progress/chapter-status";
 
 export function CourseView({ course }: { course: Course }) {
   const totalHours = course.chapters.reduce((sum, c) => sum + c.hours, 0);
@@ -93,7 +94,10 @@ export function CourseView({ course }: { course: Course }) {
                   </article>
 
                   <div className="col-start-2 mt-5 flex items-center justify-between font-mono text-[0.6875rem] text-muted-foreground sm:col-start-auto sm:mt-0 sm:flex-col sm:items-end">
-                    <p>{chapter.hours}h</p>
+                    <p>
+                      <ChapterStatus courseSlug={course.slug} chapterSlug={chapter.slug} />
+                      {chapter.hours}h
+                    </p>
                     <p>
                       {String(chapter.quiz.length).padStart(2, "0")} checks
                     </p>

@@ -12,14 +12,20 @@ chapter routes, index page, design tokens.
 
 No backend, no accounts. Everything in versioned `localStorage`.
 
-- [ ] Progress store with schema versioning + migration logic
-      (`ProgressStateV1` in handoff §8)
-- [ ] Mark-complete control on chapter pages; completion state on course index
-- [ ] Last-visited location; "continue where you left off" on the course index
+- [x] Progress store with schema versioning + migration logic
+      (`ProgressStateV1` in handoff §8; `lib/progress.ts` — note the handoff
+      references `QuizAttempt`/`DrillAttempt` without defining them, minimal
+      shapes defined there)
+- [x] Mark-complete control on chapter pages; completion state on course index
+      (`components/progress/mark-complete.tsx`, `chapter-status.tsx`,
+      `course-summary.tsx`)
+- [x] Last-visited location; "continue where you left off" on the course index
+      (`track-visit.tsx`, `continue-banner.tsx`)
 - [ ] Quiz attempt state (per-chapter, local)
 - [ ] Bookmarks and personal notes per chapter
-- [ ] Export/import progress as a small JSON file + reset control
-- [ ] Update the index page footer once this ships (currently says
+- [x] Export/import progress as a small JSON file + reset control
+      (`components/progress/data-controls.tsx`)
+- [x] Update the index page footer once this ships (currently says
       `planned: progress → localStorage`)
 
 ## 2. Interactive labs

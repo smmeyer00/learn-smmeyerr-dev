@@ -1,4 +1,19 @@
 import { courses } from "@/content";
+import {
+  ContinueBanner,
+  type ChapterTitleEntry,
+} from "@/components/progress/continue-banner";
+import { CourseSummary } from "@/components/progress/course-summary";
+import { DataControls } from "@/components/progress/data-controls";
+
+const chapterTitles: ChapterTitleEntry[] = courses.flatMap((course) =>
+  course.chapters.map((chapter) => ({
+    key: `${course.slug}/${chapter.slug}`,
+    courseSlug: course.slug,
+    courseTitle: course.title,
+    chapterTitle: chapter.title,
+  })),
+);
 
 const entries = courses.map((course) => ({
   id: course.id,
@@ -7,6 +22,7 @@ const entries = courses.map((course) => ({
   title: course.title,
   description: course.description,
   lessons: course.scope,
+  total: course.chapters.length,
   status: "live",
 }));
 
@@ -54,6 +70,7 @@ export default function Home() {
           </aside>
 
           <section aria-labelledby="course-index">
+            <ContinueBanner chapters={chapterTitles} />
             <div className="flex items-baseline justify-between border-b pb-3 font-mono text-xs">
               <h2 id="course-index">course index</h2>
               <p className="text-muted-foreground">
@@ -103,15 +120,18 @@ export default function Home() {
                       [{course.status}]
                     </p>
                     <p className="text-muted-foreground">{course.lessons}</p>
+                    <CourseSummary courseSlug={course.slug} total={course.total} />
                   </div>
                 </li>
               ))}
             </ol>
 
             <footer className="flex flex-col gap-1.5 pt-5 font-mono text-[0.6875rem] text-muted-foreground sm:flex-row sm:justify-between">
-              <p>planned: progress → localStorage</p>
+              <p>progress: local-only · no account</p>
               <p>network sync: none</p>
             </footer>
+
+            <DataControls />
           </section>
         </div>
       </div>
