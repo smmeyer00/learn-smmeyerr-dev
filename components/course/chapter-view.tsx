@@ -2,6 +2,8 @@ import Link from "next/link";
 import type { Chapter, Course } from "@/content";
 import { BookmarkButton } from "@/components/progress/bookmark-button";
 import { ChapterNotes } from "@/components/progress/chapter-notes";
+import { LabHost } from "@/components/labs/host";
+import { labsForChapter } from "@/components/labs/registry";
 import { MarkComplete } from "@/components/progress/mark-complete";
 import { Quiz } from "@/components/progress/quiz";
 import { TrackVisit } from "@/components/progress/track-visit";
@@ -249,9 +251,15 @@ export function ChapterView({
             />
           </section>
 
-          {/* Planned labs */}
+          {/* Labs */}
           <section className="mt-12">
-            <SectionLabel>labs (planned)</SectionLabel>
+            <SectionLabel>labs</SectionLabel>
+            {labsForChapter(course.slug, chapter.slug).map((labId) => (
+              <LabHost key={labId} labId={labId} />
+            ))}
+            <p className="mt-6 font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-muted-foreground">
+              planned
+            </p>
             <ul className="mt-3 space-y-2 font-mono text-xs leading-6 text-muted-foreground">
               {chapter.labs.map((lab, i) => (
                 <li key={i} className="flex gap-2.5">

@@ -34,24 +34,24 @@ No backend, no accounts. Everything in versioned `localStorage`.
 
 ## 2. Interactive labs
 
-Each chapter lists its planned labs under "labs (planned)" in the lesson
-surface (checkbox items `□`). Labs follow the
-**predict → manipulate → observe → explain → transfer** pattern and should
-replace the placeholder block as they ship. Keep each lab a code-split client
-component; the chapter page must remain server-rendered.
+Ships as code-split client islands (`components/labs/`, one chunk per lab
+via `LabHost`); chapter pages stay server-rendered. Every lab follows
+predict → manipulate → observe → explain → transfer with a caption, a
+learner task, a takeaway, illustrative-value labels, text alternatives, no
+color-alone encoding, and no animation (reduced-motion safe by
+construction).
 
-Priority order (handoff milestone 3):
-
-1. [ ] Scale Dial / source-load calculator (system-design ch. 1)
-2. [ ] Cache Stampede (ch. 4)
-3. [ ] Network Partition + Lease/Fencing (ch. 6)
-4. [ ] GPU utilization vs p99 + token-shaped capacity (ch. 11, 17)
-5. [ ] Next-Token Playground (llm ch. 1)
-6. [ ] Attention Head Explorer (llm ch. 2)
-7. [ ] Prefill/Decode + KV Cache calculator (llm ch. 4)
-8. [ ] Tool Lifecycle + Agent Loop Console (llm ch. 6, 7)
-9. [ ] RAG Pipeline Explorer (llm ch. 8)
-10. [ ] Eval Workbench + Judge Calibration (llm ch. 11)
+- [x] Scale Dial / source-load calculator (system-design ch. 1)
+- [x] Cache Stampede (ch. 4)
+- [x] Network Partition + Lease/Fencing (ch. 6)
+- [x] GPU utilization vs p99 + token-shaped capacity (sys ch. 11, llm ch. 17 —
+      shared lab, mounted on both)
+- [x] Next-Token Playground (llm ch. 1)
+- [x] Attention Head Explorer (llm ch. 2)
+- [x] Prefill/Decode + KV Cache calculator (llm ch. 4)
+- [x] Tool Lifecycle + Agent Loop Console (llm ch. 6, 7 — mounted on both)
+- [x] RAG Pipeline Explorer (llm ch. 8)
+- [x] Eval Workbench + Judge Calibration (llm ch. 11)
 
 Lab rules (handoff §5): diagrams explain causality/topology/timing/tradeoffs;
 every visual needs a caption, learner task, and takeaway; label pedagogical
