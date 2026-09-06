@@ -134,6 +134,16 @@
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-ring;
   }
+  /* No animation ships in labs or reveals (native details, static SVG
+     updates), but kill any residual motion for users who ask. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
   @media print {
     :root {
       color-scheme: light;

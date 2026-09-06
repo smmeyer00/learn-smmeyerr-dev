@@ -31,6 +31,8 @@ export type QuizQuestion = {
 export type Reference = {
   label: string;
   href: string;
+  /** YYYY-MM: when the link was verified; provider facts are update-sensitive */
+  lastReviewed?: string;
 };
 
 export type Chapter = {

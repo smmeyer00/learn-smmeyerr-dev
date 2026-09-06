@@ -270,6 +270,11 @@ export function ChapterView({
                     >
                       {ref.label} ↗
                     </a>
+                    {ref.lastReviewed && (
+                      <span className="ml-2 text-muted-foreground/70">
+                        · verified {ref.lastReviewed}
+                      </span>
+                    )}
                   </li>
                 ))}
               </ul>

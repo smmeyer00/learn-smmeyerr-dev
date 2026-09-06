@@ -1261,6 +1261,22 @@ export const llmEngineering: Course = {
         {
           label: "Evaluation best practices (OpenAI docs)",
           href: "https://developers.openai.com/api/docs/guides/evaluation-best-practices",
+          lastReviewed: "2026-09",
+        },
+        {
+          label: "Evals guide (OpenAI platform)",
+          href: "https://platform.openai.com/docs/guides/evaluation",
+          lastReviewed: "2026-09",
+        },
+        {
+          label: "Claude docs hub (Anthropic)",
+          href: "https://docs.anthropic.com/",
+          lastReviewed: "2026-09",
+        },
+        {
+          label: "Gemini API docs (Google)",
+          href: "https://ai.google.dev/gemini-api/docs",
+          lastReviewed: "2026-09",
         },
       ],
     },
@@ -2061,18 +2077,32 @@ export const llmEngineering: Course = {
         {
           label: "Responses API migration and concepts (OpenAI)",
           href: "https://developers.openai.com/api/docs/guides/migrate-to-responses",
+          lastReviewed: "2026-09",
         },
         {
           label: "Streaming Responses (OpenAI)",
           href: "https://developers.openai.com/api/docs/guides/streaming-responses",
+          lastReviewed: "2026-09",
         },
         {
           label: "Using tools (OpenAI)",
           href: "https://developers.openai.com/api/docs/guides/tools",
+          lastReviewed: "2026-09",
         },
         {
           label: "Realtime and audio (OpenAI)",
           href: "https://developers.openai.com/api/docs/guides/realtime",
+          lastReviewed: "2026-09",
+        },
+        {
+          label: "Claude docs hub (Anthropic)",
+          href: "https://docs.anthropic.com/",
+          lastReviewed: "2026-09",
+        },
+        {
+          label: "Gemini API docs (Google)",
+          href: "https://ai.google.dev/gemini-api/docs",
+          lastReviewed: "2026-09",
         },
       ],
     },

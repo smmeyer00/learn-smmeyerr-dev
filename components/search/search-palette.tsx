@@ -21,6 +21,8 @@ export function SearchPalette({ index }: { index: SearchEntry[] }) {
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const wasOpen = useRef(false);
   const listId = useId();
   const results = searchEntries(query, index);
 
@@ -44,14 +46,20 @@ export function SearchPalette({ index }: { index: SearchEntry[] }) {
 
   useEffect(() => {
     if (open) {
+      wasOpen.current = true;
       // Dialog just mounted: move focus into it (external DOM sync).
       requestAnimationFrame(() => inputRef.current?.focus());
+    } else if (wasOpen.current) {
+      wasOpen.current = false;
+      // Return focus to the trigger that opened the dialog.
+      triggerRef.current?.focus();
     }
   }, [open]);
 
   if (!open) {
     return (
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => {
           setQuery("");

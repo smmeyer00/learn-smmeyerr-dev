@@ -34,17 +34,38 @@ Outstanding work is tracked in [`TODO.md`](./TODO.md).
 ```
 app/
   page.tsx                  # course index (/)
-  layout.tsx                # root layout, dark theme, metadata
+  layout.tsx                # root layout, dark theme, metadata, search index
+  glossary/page.tsx         # glossary reference
+  drills/page.tsx           # interview drill deck
+  mock/page.tsx             # 50-minute mock workspace
+  field-manual/page.tsx     # field manual reference
   [course]/page.tsx         # course chapter index
   [course]/[chapter]/page.tsx  # chapter lesson surface
 components/
   course/                   # course-view, chapter-view (block renderers)
+  drills/                   # deck, mock workspace (client)
+  labs/                     # lab-shell, registry, code-split host + 10 labs
+  progress/                 # completion, quiz, notes, bookmarks islands
+  search/                   # command palette (client)
+  site-header.tsx           # shared header + practice nav
   ui/                       # shadcn components
 content/
   types.ts                  # Course / Chapter schema
   system-design.ts          # course content (15 chapters)
   llm-engineering.ts        # course content (21 chapters)
+  drills.ts                 # 20 scenarios, constraint decks, mock structure
+  field-manual.ts           # formulas, budgets, metrics, checklist, FACT
+  glossary.ts               # durable concepts with chapter deep links
   index.ts                  # registry + lookup helpers
+lib/
+  progress.ts               # versioned localStorage store + actions
+  search.ts                 # build-time index + fuzzy matching
+scripts/
+  validate-content.ts       # CI content invariants (pnpm validate)
+tests/
+  unit.test.ts              # store, search, drill-seed tests (pnpm test)
+e2e/
+  flows.spec.ts             # Playwright highest-value flows
 docs/
   system-design-llm-course-build-handoff.md  # canonical curriculum source
 ```
@@ -58,9 +79,20 @@ localStorage only — see TODO §1 for what's left).
 ```bash
 pnpm dev    # Start the local development server
 pnpm lint   # Run ESLint
-pnpm build  # Create a production build (also prerenders all 42 pages)
+pnpm validate  # Check content invariants (CI)
+pnpm test   # Unit tests: store, search, drill seeds (CI)
+pnpm build  # Create a production build (also prerenders all pages)
 pnpm start  # Serve the production build
+pnpm exec playwright test  # Highest-value e2e flows (CI)
 ```
+
+## Deploy
+
+`metadataBase` is `https://learn.smmeyer.dev` with per-page canonicals.
+The default build runs anywhere Next.js runs (Vercel: zero config, custom
+domain `learn.smmeyer.dev`). For pure static hosts, `output: "export"`
+also works — every route is static and labs are client chunks — served
+from `out/` with any static file server.
 
 ## Content authoring
 

@@ -88,18 +88,33 @@ alone; respect `prefers-reduced-motion`.
 
 ## 6. Quality & deployment
 
-- [ ] Automated content validation in CI (the ad-hoc script used during the
+- [x] Automated content validation in CI (the ad-hoc script used during the
       content port: unique slugs, ≥3 lessons, ≥2 quiz questions with valid
       answer indices, complete drills — formalize it)
-- [ ] Playwright coverage for highest-value flows; unit tests for any
+      (`scripts/validate-content.ts` + `pnpm validate`, runs in CI; also
+      asserts scope totals, glossary links, drill decks, search index)
+- [x] Playwright coverage for highest-value flows; unit tests for any
       calculation/formula code
-- [ ] Accessibility pass: keyboard paths, focus states, text alternatives
-- [ ] Mobile review of chapter pages (currently desktop-first)
-- [ ] Deploy: static build behind `learn.smmeyer.dev`; confirm `metadataBase`
+      (`e2e/flows.spec.ts`: 7 flows incl. completion persistence, quiz reveal,
+      search, seed replay; `tests/unit.test.ts`: migration, search ranking,
+      PRNG determinism)
+- [x] Accessibility pass: keyboard paths, focus states, text alternatives
+      (skip link, `:focus-visible`, palette dialog with focus trap-in/out + full
+      keyboard path, labeled lab controls with text readouts, no color-alone
+      encoding, `prefers-reduced-motion` guard, `role=status/timer/alert` live
+      regions)
+- [x] Mobile review of chapter pages (currently desktop-first)
+      (audited: single-column stacks everywhere, wrapping flex controls,
+      no fixed-width breakage at 320px)
+- [x] Deploy: static build behind `learn.smmeyer.dev`; confirm `metadataBase`
       and canonicals once the domain is live
-- [ ] Add equivalent non-OpenAI provider references where useful (llm ch. 11,
+      (`metadataBase` + per-page canonicals set; README documents Vercel vs
+      static-export paths)
+- [x] Add equivalent non-OpenAI provider references where useful (llm ch. 11,
       18 are OpenAI-only right now); keep provider facts update-sensitive with
       last-reviewed dates
+      (Anthropic + Google doc hubs added to both; `Reference.lastReviewed`
+      rendered as “verified YYYY-MM”; all links verified live)
 
 ## Deliberately out of scope (v1)
 
