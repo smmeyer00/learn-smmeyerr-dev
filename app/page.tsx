@@ -29,7 +29,7 @@ const entries = courses.map((course) => ({
 
 export default function Home() {
   return (
-    <main className="min-h-svh bg-background text-foreground">
+    <main id="main" className="min-h-svh bg-background text-foreground">
       <div className="mx-auto min-h-svh max-w-6xl px-4 sm:px-6">
         <header className="flex h-14 items-center justify-between border-b font-mono text-xs">
           <p className="font-medium text-foreground">

@@ -76,9 +76,12 @@ alone; respect `prefers-reduced-motion`.
 
 ## 5. Search & navigation
 
-- [ ] Command/search palette across chapter titles, concepts, drills, glossary
-- [ ] Precompute the search index at build time (Pagefind or Fuse.js)
-- [ ] Glossary content file
+- [x] Command/search palette across chapter titles, concepts, drills, glossary
+      (`components/search/search-palette.tsx`, ⌘K/Ctrl+K, full keyboard path)
+- [x] Precompute the search index at build time (Pagefind or Fuse.js)
+      (no dependency: `lib/search.ts` builds a static serialized index in the
+      root layout; drills + manual entries wired in with those sections)
+- [x] Glossary content file (`content/glossary.ts`, rendered at `/glossary`)
 
 ## 6. Quality & deployment
 

@@ -58,7 +58,7 @@ export function ChapterView({
   const next = index < course.chapters.length - 1 ? course.chapters[index + 1] : undefined;
 
   return (
-    <main className="min-h-svh bg-background text-foreground">
+    <main id="main" className="min-h-svh bg-background text-foreground">
       <TrackVisit courseSlug={course.slug} chapterSlug={chapter.slug} />
       <div className="mx-auto min-h-svh max-w-6xl px-4 sm:px-6">
         <header className="flex h-14 items-center justify-between border-b font-mono text-xs">
