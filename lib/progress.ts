@@ -42,6 +42,8 @@ export type DrillAttempt = {
    * framing / correctness / depth / tradeoffs / recovery).
    */
   score?: number;
+  /** interview-mode drill id (e.g. "url-shortener") for drills deck entries */
+  drillId?: string;
   note?: string;
 };
 
@@ -226,6 +228,15 @@ export function useProgress(): ProgressStateV1 {
   return useSyncExternalStore(subscribe, getSnapshot, () => serverSnapshot);
 }
 
+/** Reactive access to a single chapter note (stable primitive snapshot). */
+export function useNote(key: string): string {
+  return useSyncExternalStore(
+    subscribe,
+    () => getSnapshot().notes[key] ?? "",
+    () => "",
+  );
+}
+
 function update(fn: (prev: ProgressStateV1) => ProgressStateV1): void {
   if (!isClient()) return;
   cached = fn(getSnapshot());
@@ -256,7 +267,70 @@ export function toggleChapterComplete(key: string): void {
   });
 }
 
-/** Record a chapter view. Skips the write when nothing changed. */
+/** Append a quiz attempt (history kept; latest per question wins in UI). */
+export function recordQuizAttempt(attempt: QuizAttempt): void {
+  update((prev) => ({
+    ...prev,
+    quizAttempts: {
+      ...prev.quizAttempts,
+      [attempt.chapterKey]: [
+        ...(prev.quizAttempts[attempt.chapterKey] ?? []),
+        attempt,
+      ],
+    },
+  }));
+}
+
+export function latestQuizAttempts(
+  state: ProgressStateV1,
+  key: string,
+): Map<number, QuizAttempt> {
+  const latest = new Map<number, QuizAttempt>();
+  for (const attempt of state.quizAttempts[key] ?? []) {
+    latest.set(attempt.questionIndex, attempt);
+  }
+  return latest;
+}
+
+export function isBookmarked(state: ProgressStateV1, key: string): boolean {
+  return state.bookmarks.includes(key);
+}
+
+export function toggleBookmark(key: string): void {
+  update((prev) => ({
+    ...prev,
+    bookmarks: prev.bookmarks.includes(key)
+      ? prev.bookmarks.filter((k) => k !== key)
+      : [...prev.bookmarks, key],
+  }));
+}
+
+export function getNote(state: ProgressStateV1, key: string): string {
+  return state.notes[key] ?? "";
+}
+
+/** Writers must debounce (see ChapterNotes); skips the write when unchanged. */
+export function saveNote(key: string, text: string): void {
+  if (!isClient()) return;
+  const trimmed = text.trim();
+  const current = getSnapshot().notes[key] ?? "";
+  if (current === trimmed) return;
+  update((prev) => {
+    if ((prev.notes[key] ?? "") === trimmed) return prev;
+    const notes = { ...prev.notes };
+    if (trimmed.length === 0) delete notes[key];
+    else notes[key] = trimmed;
+    return { ...prev, notes };
+  });
+}
+
+/** Log an interview-mode drill/mock attempt (drill deck, mock workspace). */
+export function recordDrillAttempt(attempt: DrillAttempt): void {
+  update((prev) => ({
+    ...prev,
+    drillAttempts: [...prev.drillAttempts, attempt],
+  }));
+}
 export function recordVisit(key: string): void {
   if (!isClient()) return;
   if (getSnapshot().lastVisited === key) return;

@@ -21,8 +21,12 @@ No backend, no accounts. Everything in versioned `localStorage`.
       `course-summary.tsx`)
 - [x] Last-visited location; "continue where you left off" on the course index
       (`track-visit.tsx`, `continue-banner.tsx`)
-- [ ] Quiz attempt state (per-chapter, local)
-- [ ] Bookmarks and personal notes per chapter
+- [x] Quiz attempt state (per-chapter, local)
+      (`components/progress/quiz.tsx` — interactive checks, attempts kept
+      in `quizAttempts`)
+- [x] Bookmarks and personal notes per chapter
+      (`bookmark-button.tsx`, `chapter-notes.tsx` with debounced save,
+      `bookmarks-list.tsx` on the index)
 - [x] Export/import progress as a small JSON file + reset control
       (`components/progress/data-controls.tsx`)
 - [x] Update the index page footer once this ships (currently says

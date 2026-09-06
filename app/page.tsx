@@ -4,6 +4,7 @@ import {
   type ChapterTitleEntry,
 } from "@/components/progress/continue-banner";
 import { CourseSummary } from "@/components/progress/course-summary";
+import { BookmarksList } from "@/components/progress/bookmarks-list";
 import { DataControls } from "@/components/progress/data-controls";
 
 const chapterTitles: ChapterTitleEntry[] = courses.flatMap((course) =>
@@ -132,6 +133,7 @@ export default function Home() {
             </footer>
 
             <DataControls />
+            <BookmarksList chapters={chapterTitles} />
           </section>
         </div>
       </div>

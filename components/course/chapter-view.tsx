@@ -1,6 +1,9 @@
 import Link from "next/link";
 import type { Chapter, Course } from "@/content";
+import { BookmarkButton } from "@/components/progress/bookmark-button";
+import { ChapterNotes } from "@/components/progress/chapter-notes";
 import { MarkComplete } from "@/components/progress/mark-complete";
+import { Quiz } from "@/components/progress/quiz";
 import { TrackVisit } from "@/components/progress/track-visit";
 
 function SectionLabel({ children }: { children: string }) {
@@ -239,42 +242,11 @@ export function ChapterView({
           {/* Knowledge checks */}
           <section className="mt-12">
             <SectionLabel>knowledge checks</SectionLabel>
-            <ol className="mt-3 space-y-6">
-              {chapter.quiz.map((q, qi) => (
-                <li key={qi} className="border-b pb-6">
-                  <p className="text-[0.9375rem] font-medium leading-7 text-foreground">
-                    <span className="mr-3 font-mono text-xs text-muted-foreground">
-                      {String(qi + 1).padStart(2, "0")}
-                    </span>
-                    {q.question}
-                  </p>
-                  <ul className="mt-3 grid gap-1.5 font-mono text-xs leading-6 text-muted-foreground">
-                    {q.options.map((option, oi) => (
-                      <li key={oi} className="flex gap-2.5">
-                        <span className="text-border">
-                          {String.fromCharCode(65 + oi)}.
-                        </span>
-                        {option}
-                      </li>
-                    ))}
-                  </ul>
-                  <details className="mt-3">
-                    <summary className="cursor-pointer select-none font-mono text-[0.6875rem] text-muted-foreground transition-colors hover:text-foreground">
-                      [ answer + explanation ]
-                    </summary>
-                    <p className="mt-2.5 text-sm leading-6 text-muted-foreground">
-                      <span className="font-mono text-xs text-primary">
-                        {String.fromCharCode(65 + q.answer)} —
-                      </span>{" "}
-                      <span className="font-mono text-xs text-foreground">
-                        {q.options[q.answer]}
-                      </span>{" "}
-                      · {q.explanation}
-                    </p>
-                  </details>
-                </li>
-              ))}
-            </ol>
+            <Quiz
+              courseSlug={course.slug}
+              chapterSlug={chapter.slug}
+              questions={chapter.quiz}
+            />
           </section>
 
           {/* Planned labs */}
@@ -317,10 +289,19 @@ export function ChapterView({
             </section>
           )}
 
+          {/* Personal notes */}
+          <section className="mt-12">
+            <SectionLabel>notes</SectionLabel>
+            <ChapterNotes courseSlug={course.slug} chapterSlug={chapter.slug} />
+          </section>
+
           {/* Prev / next */}
           <nav className="mt-16 border-t pt-5">
-            <div className="flex items-center justify-between font-mono text-xs">
-              <MarkComplete courseSlug={course.slug} chapterSlug={chapter.slug} />
+            <div className="flex items-center justify-between gap-4 font-mono text-xs">
+              <div className="flex items-center gap-5">
+                <MarkComplete courseSlug={course.slug} chapterSlug={chapter.slug} />
+                <BookmarkButton courseSlug={course.slug} chapterSlug={chapter.slug} />
+              </div>
               <p className="text-muted-foreground">
                 {String(chapter.order).padStart(2, "0")}/{String(course.chapters.length).padStart(2, "0")}
               </p>
