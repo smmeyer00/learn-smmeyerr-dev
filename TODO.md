@@ -60,13 +60,14 @@ alone; respect `prefers-reduced-motion`.
 
 ## 3. Interview mode
 
-- [ ] Drill deck: the 20 scenarios from handoff §7 with randomizable
+- [x] Drill deck: the 20 scenarios from handoff §7 with randomizable
       constraint cards (scale, traffic shape, SLO, failure, security, residency,
-      cost) and reproducible seeds
-- [ ] Timed mock workspace (50-minute guided flow) + self-scorecard
-      (framing/correctness/depth/tradeoffs/recovery, 1–4)
-- [ ] 48-hour redo queue for weak drills
-- [ ] Oral fluency timers (llm ch. 21 circuit)
+      cost) and reproducible seeds (`content/drills.ts`, `/drills`)
+- [x] Timed mock workspace (50-minute guided flow) + self-scorecard
+      (framing/correctness/depth/tradeoffs/recovery, 1–4) (`/mock`)
+- [x] 48-hour redo queue for weak drills (local `drillAttempts`, weak ≤2 first,
+      then unattempted, then 48h+ stale)
+- [x] Oral fluency timers (llm ch. 21 circuit) (fluency circuit on `/drills`)
 
 ## 4. Field manual
 

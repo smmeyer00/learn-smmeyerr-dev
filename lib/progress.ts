@@ -35,7 +35,8 @@ export type QuizAttempt = {
 };
 
 export type DrillAttempt = {
-  chapterKey: string;
+  /** chapter key when tied to a chapter; absent for deck/mock drills */
+  chapterKey?: string;
   completedAt: string; // ISO timestamp
   /**
    * Optional 1–4 self-score (handoff interview-mode axes:
@@ -124,7 +125,7 @@ export function migrateProgress(raw: unknown): ProgressStateV1 {
     ? data.drillAttempts.filter(
         (d): d is DrillAttempt =>
           isRecord(d) &&
-          typeof d.chapterKey === "string" &&
+          (d.chapterKey === undefined || typeof d.chapterKey === "string") &&
           typeof d.completedAt === "string",
       )
     : [];
