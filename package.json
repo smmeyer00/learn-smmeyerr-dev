@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "validate": "tsx scripts/validate-content.ts",
-    "test": "tsx --test tests/unit.test.ts tests/review-fixes.test.ts"
+    "test": "tsx --test tests/unit.test.ts tests/review-fixes.test.ts",
+    "check-links": "tsx scripts/check-links.ts",
+    "perf": "pnpm build && node scripts/lighthouse.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
@@ -27,8 +29,10 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "chrome-launcher": "^1.2.1",
     "eslint": "^9",
     "eslint-config-next": "16.3.4",
+    "lighthouse": "^13.4.1",
     "tailwindcss": "^4",
     "tsx": "^4.23.13",
     "typescript": "^5"

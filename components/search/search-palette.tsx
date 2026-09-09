@@ -71,7 +71,7 @@ export function SearchPalette({ index }: { index: SearchEntry[] }) {
         className="fixed bottom-5 right-5 z-40 cursor-pointer rounded-md border border-border bg-secondary/90 px-3 py-1.5 font-mono text-[0.6875rem] text-muted-foreground shadow-lg backdrop-blur transition-colors hover:border-primary/50 hover:text-foreground"
       >
         [ search ]
-        <span className="ml-2 text-border">⌘K</span>
+        <span className="ml-2">⌘K</span>
       </button>
     );
   }

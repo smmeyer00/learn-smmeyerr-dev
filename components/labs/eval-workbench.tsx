@@ -114,7 +114,7 @@ export function EvalWorkbench() {
               </span>
               <span className="sr-only">{pass ? "pass" : "fail"}</span>
               <span className="flex-1">{c.id}</span>
-              <span className="text-border">{c.slice}</span>
+              <span className="text-muted-foreground">{c.slice}</span>
             </li>
           );
         })}

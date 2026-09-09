@@ -81,6 +81,8 @@ pnpm dev    # Start the local development server
 pnpm lint   # Run ESLint
 pnpm validate  # Check content invariants (CI)
 pnpm test   # Unit tests: store, search, drill seeds (CI)
+pnpm check-links  # Fetch every reference URL (manual, pre-deploy — not CI)
+pnpm perf   # Build + Lighthouse floors on index/chapter/lab (manual, pre-deploy)
 pnpm build  # Create a production build (also prerenders all pages)
 pnpm start  # Serve the production build
 pnpm exec playwright test  # Highest-value e2e flows (CI)

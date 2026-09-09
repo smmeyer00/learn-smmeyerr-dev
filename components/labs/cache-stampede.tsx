@@ -33,9 +33,10 @@ export function CacheStampede() {
         <LabSlider label="hot-key share" value={hotPct} min={1} max={100} step={1} display={`${fmtInt.format(hotPct)} %`} onChange={setHotPct} />
         <LabSlider label="source recompute time" value={recomputeMs} min={10} max={2000} step={10} display={`${fmtInt.format(recomputeMs)} ms`} onChange={setRecomputeMs} />
         <div>
-          <p className="font-mono text-xs text-foreground">request coalescing</p>
+          <p id="coalescing-label" className="font-mono text-xs text-foreground">request coalescing</p>
           <button
             type="button"
+            aria-labelledby="coalescing-label"
             onClick={() => setCoalesced((v) => !v)}
             aria-pressed={coalesced}
             className="mt-2 cursor-pointer rounded border border-border px-3 py-1.5 font-mono text-xs text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"

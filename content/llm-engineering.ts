@@ -1264,8 +1264,8 @@ export const llmEngineering: Course = {
           lastReviewed: "2026-09",
         },
         {
-          label: "Evals guide (OpenAI platform)",
-          href: "https://platform.openai.com/docs/guides/evaluation",
+          label: "Evals examples (OpenAI cookbook)",
+          href: "https://github.com/openai/openai-cookbook",
           lastReviewed: "2026-09",
         },
         {

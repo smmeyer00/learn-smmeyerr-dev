@@ -83,7 +83,7 @@ export function Quiz({
                           : "border-transparent text-muted-foreground hover:border-border hover:text-foreground"
                     }`}
                   >
-                    <span className="text-border">{letters[oi]}.</span>
+                    <span className="text-muted-foreground">{letters[oi]}.</span>
                     <span className="flex-1">{option}</span>
                     {showState && isAnswer && (
                       <span className="text-primary">✓ correct</span>
