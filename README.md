@@ -17,7 +17,9 @@ learning loop: outcome → why it matters → coverage map → mental model →
 lessons → senior signal → failure patterns → interview drill → knowledge
 checks → planned labs → references.
 
-Outstanding work is tracked in [`TODO.md`](./TODO.md).
+Outstanding work is tracked in [`TODO.md`](./TODO.md); parked ideas live
+in [`docs/ROADMAP.md`](./docs/ROADMAP.md). If you are an agent starting a
+new session, read [`AGENTS.md`](./AGENTS.md) first.
 
 ## Stack
 
@@ -62,17 +64,24 @@ lib/
   search.ts                 # build-time index + fuzzy matching
 scripts/
   validate-content.ts       # CI content invariants (pnpm validate)
+  check-links.ts            # on-demand reference URL check (pnpm check-links)
+  lighthouse.mjs            # Lighthouse floors vs local prod (pnpm perf)
 tests/
   unit.test.ts              # store, search, drill-seed tests (pnpm test)
+  review-fixes.test.ts      # lab math, import guard, redo queue (pnpm test)
 e2e/
   flows.spec.ts             # Playwright highest-value flows
+  crawl.spec.ts             # every static URL: 200 + landmarks + no errors
+  labs.spec.ts              # all 10 labs driven through real input events
+  storage.spec.ts           # full localStorage round trip
 docs/
   system-design-llm-course-build-handoff.md  # canonical curriculum source
+  ROADMAP.md                # parked ideas (not promised)
 ```
 
 All routes are statically generated via `generateStaticParams`; pages are
-server-rendered with small client islands for progress (`components/progress/`,
-localStorage only — see TODO §1 for what's left).
+server-rendered with small client islands for progress, labs, drills, and
+search (`components/*/`, localStorage only).
 
 ## Commands
 
