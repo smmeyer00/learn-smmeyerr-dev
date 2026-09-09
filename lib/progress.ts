@@ -356,6 +356,30 @@ export function exportProgressJson(): string {
   return JSON.stringify(getSnapshot(), null, 2);
 }
 
+const PROGRESS_KEYS = [
+  "completedChapters",
+  "lessonPositions",
+  "quizAttempts",
+  "drillAttempts",
+  "bookmarks",
+  "notes",
+  "lastVisited",
+  "preferences",
+] as const;
+
+/** True when the state holds anything worth keeping (for replace guards). */
+export function hasProgressData(state: ProgressStateV1): boolean {
+  return (
+    state.completedChapters.length > 0 ||
+    state.drillAttempts.length > 0 ||
+    state.bookmarks.length > 0 ||
+    Object.keys(state.notes).length > 0 ||
+    Object.keys(state.quizAttempts).length > 0 ||
+    Object.keys(state.lessonPositions).length > 0 ||
+    state.lastVisited !== undefined
+  );
+}
+
 export function importProgressJson(json: string): { ok: true } | { ok: false; error: string } {
   let parsed: unknown;
   try {
@@ -364,6 +388,14 @@ export function importProgressJson(json: string): { ok: true } | { ok: false; er
     return { ok: false, error: "not valid JSON" };
   }
   if (!isRecord(parsed)) return { ok: false, error: "not a progress file" };
+  // Strict gate: a real export always carries the version marker plus at
+  // least one recognized key, so stray JSON can never wipe study history.
+  if (parsed.schemaVersion !== SCHEMA_VERSION) {
+    return { ok: false, error: `unsupported schema (want v${SCHEMA_VERSION})` };
+  }
+  if (!PROGRESS_KEYS.some((key) => key in parsed)) {
+    return { ok: false, error: "no progress data found" };
+  }
   const migrated = migrateProgress(parsed);
   if (!isClient()) return { ok: true };
   cached = migrated;

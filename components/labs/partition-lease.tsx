@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { LabShell } from "./lab-shell";
+import { minorityVerdict } from "./models";
 import { LabSlider, LabStat } from "./ui";
 
 type Scenario = "healthy" | "one-down" | "partition";
@@ -55,12 +56,19 @@ export function PartitionLease() {
           ? "writes only (unsafe without overlap)"
           : "refuses — no quorum";
 
-  const minorityVerdict =
-    scenario !== "partition" || minor === 0
+  const minority = minorityVerdict({
+    minor,
+    writeQuorum: clampedW,
+    fencing,
+  });
+  const minorityShort =
+    minority.status === "none"
       ? null
-      : fencing
-        ? `minority side (${minor} nodes) refuses writes — fenced by lease token, no split brain.`
-        : `minority side (${minor} nodes) still accepts writes — SPLIT BRAIN: two divergent histories to reconcile.`;
+      : minority.status === "refuses-fenced"
+        ? "refuses (fenced)"
+        : minority.status === "stalls-quorum"
+          ? "stalls (no write quorum)"
+          : "accepts (SPLIT BRAIN)";
 
   return (
     <LabShell
@@ -110,16 +118,16 @@ export function PartitionLease() {
         <LabStat label="overlap R + W > N" value={overlap ? `yes (${clampedR}+${clampedW} > ${n})` : `NO (${clampedR}+${clampedW} ≤ ${n}) — stale reads legal`} accent />
         <LabStat label="tolerated failures" value={`${Math.min(n - clampedR, n - clampedW)} node(s) before reads or writes stall`} />
         <LabStat label={`majority side (${major} nodes)`} value={canServe(major)} />
-        {minor > 0 && (
-          <LabStat label={`minority side (${minor} nodes)`} value={fencing ? "refuses (fenced)" : "accepts (SPLIT BRAIN)"} accent />
+        {minor > 0 && minorityShort && (
+          <LabStat label={`minority side (${minor} nodes)`} value={minorityShort} accent />
         )}
       </dl>
       <p className="font-mono text-xs leading-5 text-muted-foreground">
         {scenarioDetail[scenario].note}
       </p>
-      {minorityVerdict && (
+      {minority.status !== "none" && (
         <p role="status" className="rounded border border-primary/30 bg-primary/5 p-3 font-mono text-xs leading-5 text-foreground">
-          {minorityVerdict}
+          {minority.text}
         </p>
       )}
     </LabShell>

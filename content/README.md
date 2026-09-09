@@ -41,7 +41,7 @@ The build assumes and content review must enforce:
 - ≥ 3 lessons, ≥ 2 quiz questions, exactly 4 options each, valid answer index
 - ≥ 4 coverage entries, ≥ 1 lab entry
 
-(TODO.md item 6 tracks turning the ad-hoc validation script into CI.)
+(Validation lives in `scripts/validate-content.ts`, run via `pnpm validate` in CI.)
 
 ## Adding or revising a chapter
 
@@ -58,7 +58,10 @@ never published.
 - **Provenance:** the transcript is ported from
   `docs/system-design-llm-course-build-handoff.md`, which remains canonical
   for curriculum intent. A few garbled fragments in the source were
-  normalized without changing meaning. Expansion is welcome; silent deletion
+  normalized without changing meaning. Known wart: the handoff's scope lines
+  (`~46h` / `~39h`) disagree with its own per-chapter estimates, which sum to
+  56h / 73h — the port follows the per-chapter numbers and `pnpm validate`
+  asserts `scope` matches the sum. Expansion is welcome; silent deletion
   or flattening of drills, answers, or coverage is not.
 - **Update-sensitive facts:** model names, prices, context limits, rate
   limits, and provider capabilities change. Do not hard-code them as timeless

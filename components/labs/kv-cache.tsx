@@ -2,22 +2,30 @@
 
 import { useState } from "react";
 import { LabShell } from "./lab-shell";
+import { kvBytesPerToken } from "./models";
 import { LabBar, LabSlider, LabStat, fmt1, fmtBytes, fmtInt } from "./ui";
 
 /**
  * Prefill/Decode + KV Cache calculator (llm-engineering ch. 4).
- * Real formula (2 × layers × dim × bytes per token), your assumptions:
+ * KV width is kvHeads × headDim (grouped-query attention); plain hidden
+ * dim is only correct for non-grouped MHA. Your assumptions, honest math:
  * memory per request → fleet pressure → TTFT risk readout.
  */
 export function KvCache() {
   const [layers, setLayers] = useState(80);
-  const [dim, setDim] = useState(8192);
+  const [kvHeads, setKvHeads] = useState(8);
+  const [headDim, setHeadDim] = useState(128);
   const [bytes, setBytes] = useState(2);
   const [seqLen, setSeqLen] = useState(4000);
   const [concurrent, setConcurrent] = useState(64);
   const [gpuGb, setGpuGb] = useState(80);
 
-  const perToken = 2 * layers * dim * bytes;
+  const perToken = kvBytesPerToken({
+    layers,
+    kvHeads,
+    headDim,
+    bytesPerValue: bytes,
+  });
   const perRequest = perToken * seqLen;
   const total = perRequest * concurrent;
   const gpuBytes = gpuGb * 1024 ** 3;
@@ -39,14 +47,15 @@ export function KvCache() {
   return (
     <LabShell
       title="KV Cache — why long context costs memory"
-      predict="80 layers × 8192 dim × fp16 × 4k tokens: roughly how many GB per request? Guess an order of magnitude first."
+      predict="80 layers × 8 KV heads × 128 head-dim × fp16 × 4k tokens: roughly how many GB per request? Guess an order of magnitude first."
       task="Double the sequence length and watch per-request memory quadruple… no — double (linear in seq). Then raise concurrency and find where one 80GB card stops fitting."
-      takeaway="KV memory is linear in layers × width × bytes × tokens × concurrent requests. Every knob is multiplicative, so context limits are memory limits wearing a product mask."
+      takeaway="KV memory is linear in layers × KV-heads × head-dim × bytes × tokens × concurrent requests. Full hidden dim only applies to non-grouped attention — modern GQA models carry a fraction of that. Every knob is multiplicative, so context limits are memory limits wearing a product mask."
       transfer="When someone proposes 1M-token context windows, redo this math before discussing anything else."
     >
       <div className="grid gap-4 sm:grid-cols-2">
         <LabSlider label="layers" value={layers} min={12} max={128} step={1} onChange={setLayers} />
-        <LabSlider label="hidden dim" value={dim} min={1024} max={16384} step={256} onChange={setDim} />
+        <LabSlider label="KV heads (GQA)" value={kvHeads} min={1} max={64} step={1} display={`${fmtInt.format(kvHeads)} (= hidden dim only if MHA)`} onChange={setKvHeads} />
+        <LabSlider label="head dim" value={headDim} min={32} max={256} step={8} onChange={setHeadDim} />
         <LabSlider label="bytes per value" value={bytes} min={1} max={4} step={1} display={bytes === 2 ? "2 (fp16)" : `${bytes}`} onChange={setBytes} />
         <LabSlider label="sequence length" value={seqLen} min={512} max={128_000} step={512} display={`${fmtInt.format(seqLen)} tok`} onChange={setSeqLen} />
         <LabSlider label="concurrent requests" value={concurrent} min={1} max={1024} step={1} onChange={setConcurrent} />

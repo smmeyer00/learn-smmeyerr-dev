@@ -1,39 +1,18 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import {
+  buildRedoQueue,
   constraintDecks,
   drawScenario,
   drillScenarios,
   fluencyPrompts,
   randomSeed,
   type DrawnScenario,
+  type QueueState,
 } from "@/content/drills";
-import {
-  recordDrillAttempt,
-  useProgress,
-  type DrillAttempt,
-} from "@/lib/progress";
-
-const DAY_MS = 86_400_000;
-
-type QueueState = "weak" | "due" | "fresh" | "new";
-
-function queueState(
-  attempts: DrillAttempt[],
-  drillId: string,
-  now: number,
-): { state: QueueState; lastScore?: number; lastAt?: number } {
-  const mine = attempts.filter((a) => a.drillId === drillId);
-  if (mine.length === 0) return { state: "new" };
-  const last = mine[mine.length - 1];
-  const lastAt = Date.parse(last.completedAt);
-  if (last.score !== undefined && last.score <= 2)
-    return { state: "weak", lastScore: last.score, lastAt };
-  if (Number.isNaN(lastAt) || now - lastAt > 2 * DAY_MS)
-    return { state: "due", lastScore: last.score, lastAt };
-  return { state: "fresh", lastScore: last.score, lastAt };
-}
+import { recordDrillAttempt, useProgress } from "@/lib/progress";
 
 const stateLabel: Record<QueueState, string> = {
   weak: "redo — scored weak",
@@ -121,13 +100,7 @@ export function DrillDeck() {
   const [logged, setLogged] = useState(false);
   const [now] = useState(() => Date.now());
   const queue = useMemo(
-    () =>
-      drillScenarios
-        .map((s) => ({ scenario: s, ...queueState(progress.drillAttempts, s.id, now) }))
-        .sort((a, b) => {
-          const rank: Record<QueueState, number> = { weak: 0, new: 1, due: 2, fresh: 3 };
-          return rank[a.state] - rank[b.state];
-        }),
+    () => buildRedoQueue(progress.drillAttempts, now),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [progress.drillAttempts],
   );
@@ -243,31 +216,35 @@ export function DrillDeck() {
           48-hour redo queue
         </h2>
         <ol className="mt-3 border-t">
-          {queue.map(({ scenario, state, lastScore }) => (
-            <li key={scenario.id} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b py-2.5">
+          {queue.map((row) => (
+            <li key={row.id} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b py-2.5">
               <p className="text-sm text-foreground">
-                <button
-                  type="button"
-                  onClick={() => {
-                    roll(randomSeed());
-                    setDraw((d) =>
-                      d
-                        ? { ...d, scenario }
-                        : d,
-                    );
-                  }}
-                  className="cursor-pointer underline decoration-border underline-offset-4 transition-colors hover:text-primary"
-                >
-                  {scenario.title}
-                </button>
+                {row.kind === "scenario" ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const fresh = drawScenario(randomSeed());
+                      const scenario = drillScenarios.find((s) => s.id === row.id);
+                      setDraw(scenario ? { ...fresh, scenario } : fresh);
+                      setLogged(false);
+                    }}
+                    className="cursor-pointer underline decoration-border underline-offset-4 transition-colors hover:text-primary"
+                  >
+                    {row.title}
+                  </button>
+                ) : (
+                  <Link href="/mock" className="underline decoration-border underline-offset-4 transition-colors hover:text-primary">
+                    {row.title}
+                  </Link>
+                )}
                 <span className="ml-3 font-mono text-[0.6875rem] text-muted-foreground">
-                  {scenario.track}
-                  {lastScore !== undefined && ` · last ${lastScore}/4`}
+                  {row.track}
+                  {row.lastScore !== undefined && ` · last ${row.lastScore}/4`}
                 </span>
               </p>
-              <p className={`font-mono text-[0.6875rem] ${state === "weak" ? "text-destructive" : state === "fresh" ? "text-muted-foreground" : "text-primary"}`}>
-                {state === "weak" ? "✗ " : state === "fresh" ? "✓ " : "→ "}
-                {stateLabel[state]}
+              <p className={`font-mono text-[0.6875rem] ${row.state === "weak" ? "text-destructive" : row.state === "fresh" ? "text-muted-foreground" : "text-primary"}`}>
+                {row.state === "weak" ? "✗ " : row.state === "fresh" ? "✓ " : "→ "}
+                {stateLabel[row.state]}
               </p>
             </li>
           ))}

@@ -5,6 +5,8 @@
  * ("Cross-course practice surfaces"); cards are authored to the same brief.
  */
 
+import type { DrillAttempt } from "../lib/progress";
+
 export type DrillScenario = {
   id: string;
   title: string;
@@ -159,6 +161,103 @@ export function drawScenario(seed: number): DrawnScenario {
 
 export function randomSeed(): number {
   return Math.floor(Math.random() * 2 ** 31);
+}
+
+// ---------------------------------------------------------------------------
+// 48-hour redo queue (deck scenarios + mock workspace reps, all local)
+// ---------------------------------------------------------------------------
+
+export type QueueState = "weak" | "due" | "fresh" | "new";
+
+/** A drill is due for revisit 48h after its last attempt. */
+export const REDO_WINDOW_MS = 2 * 86_400_000;
+
+export function attemptQueueState(
+  attempts: DrillAttempt[],
+  drillId: string,
+  now: number,
+): { state: QueueState; lastScore?: number; lastAt?: number } {
+  const mine = attempts.filter((a) => a.drillId === drillId);
+  if (mine.length === 0) return { state: "new" };
+  const last = mine[mine.length - 1];
+  const lastAt = Date.parse(last.completedAt);
+  if (last.score !== undefined && last.score <= 2)
+    return { state: "weak", lastScore: last.score, lastAt };
+  if (Number.isNaN(lastAt) || now - lastAt > REDO_WINDOW_MS)
+    return { state: "due", lastScore: last.score, lastAt };
+  return { state: "fresh", lastScore: last.score, lastAt };
+}
+
+export type RedoRow =
+  | {
+      kind: "scenario";
+      id: string;
+      title: string;
+      track: string;
+      state: QueueState;
+      lastScore?: number;
+    }
+  | {
+      kind: "mock";
+      id: string;
+      title: string;
+      track: "mock rep";
+      state: QueueState;
+      lastScore?: number;
+    };
+
+const queueRank: Record<QueueState, number> = {
+  weak: 0,
+  new: 1,
+  due: 2,
+  fresh: 3,
+};
+
+function mockTitle(attempt: DrillAttempt, fallback: string): string {
+  const note = attempt.note ?? "";
+  const match = note.match(/^mock: (.+?) — /);
+  return match ? match[1] : fallback;
+}
+
+/**
+ * Every scenario plus every mock rep, weakest first. Mock reps link back
+ * to /mock; scenarios reload into the deck above.
+ */
+export function buildRedoQueue(
+  attempts: DrillAttempt[],
+  now: number,
+): RedoRow[] {
+  const scenarioRows: RedoRow[] = drillScenarios.map((s) => ({
+    kind: "scenario",
+    id: s.id,
+    title: s.title,
+    track: s.track,
+    ...attemptQueueState(attempts, s.id, now),
+  }));
+
+  const seenMockIds = new Set<string>();
+  const mockRows: RedoRow[] = [];
+  for (const attempt of attempts) {
+    if (
+      attempt.drillId === undefined ||
+      !attempt.drillId.startsWith("mock:") ||
+      seenMockIds.has(attempt.drillId)
+    ) {
+      continue;
+    }
+    seenMockIds.add(attempt.drillId);
+    mockRows.push({
+      kind: "mock",
+      id: attempt.drillId,
+      title: mockTitle(attempt, "mock rep"),
+      track: "mock rep",
+      ...attemptQueueState(attempts, attempt.drillId, now),
+    });
+  }
+
+  return [...scenarioRows, ...mockRows].sort(
+    (a, b) => queueRank[a.state] - queueRank[b.state],
+  );
 }
 
 // ---------------------------------------------------------------------------

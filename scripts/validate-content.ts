@@ -6,6 +6,7 @@
  * Run: pnpm validate
  */
 import { courses } from "../content/index";
+import { labsForChapter } from "../components/labs/registry";
 import { drillScenarios, constraintDecks } from "../content/drills";
 import { fieldManual } from "../content/field-manual";
 import { glossary } from "../content/glossary";
@@ -93,6 +94,18 @@ for (const course of courses) {
     }
     hours += chapter.hours;
   });
+
+  for (const chapter of course.chapters) {
+    for (const lab of labsForChapter(course.slug, chapter.slug)) {
+      check(
+        lab.replacesPlanned.every(
+          (idx) =>
+            Number.isInteger(idx) && idx >= 0 && idx < chapter.labs.length,
+        ),
+        `${course.slug}/${chapter.slug}: lab ${lab.id} replacesPlanned out of range`,
+      );
+    }
+  }
 
   const scopeMatch = course.scope.match(/~\s*(\d+)\s*hours?/);
   check(

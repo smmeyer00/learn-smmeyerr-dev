@@ -22,6 +22,7 @@ export function SearchPalette({ index }: { index: SearchEntry[] }) {
   const [active, setActive] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const wasOpen = useRef(false);
   const listId = useId();
   const results = searchEntries(query, index);
@@ -81,11 +82,32 @@ export function SearchPalette({ index }: { index: SearchEntry[] }) {
       onClick={() => setOpen(false)}
     >
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-label="search courses"
         className="w-full max-w-xl overflow-hidden rounded-md border border-border bg-card shadow-2xl"
         onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => {
+          // Trap Tab inside the modal: background controls are unreachable
+          // while open (pairs with aria-modal).
+          if (e.key !== "Tab" || !dialogRef.current) return;
+          const focusables = Array.from(
+            dialogRef.current.querySelectorAll<HTMLElement>(
+              'a[href], button:not([disabled]), input:not([disabled])',
+            ),
+          ).filter((el) => el.offsetParent !== null);
+          if (focusables.length === 0) return;
+          const first = focusables[0];
+          const last = focusables[focusables.length - 1];
+          if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }}
       >
         <div className="flex items-center gap-3 border-b border-border px-4">
           <span aria-hidden="true" className="font-mono text-xs text-primary">
@@ -161,7 +183,7 @@ export function SearchPalette({ index }: { index: SearchEntry[] }) {
           </ul>
         ) : (
           <p className="px-4 py-6 font-mono text-xs text-muted-foreground">
-            {query.trim() ? "no matches — try fewer words" : "type to search 36 chapters + glossary"}
+            {query.trim() ? "no matches — try fewer words" : "type to search chapters, glossary, drills + manual"}
           </p>
         )}
       </div>

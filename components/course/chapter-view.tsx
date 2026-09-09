@@ -59,6 +59,9 @@ export function ChapterView({
   const index = course.chapters.findIndex((c) => c.slug === chapter.slug);
   const prev = index > 0 ? course.chapters[index - 1] : undefined;
   const next = index < course.chapters.length - 1 ? course.chapters[index + 1] : undefined;
+  const shippedLabs = labsForChapter(course.slug, chapter.slug);
+  const hiddenPlanned = new Set(shippedLabs.flatMap((lab) => lab.replacesPlanned));
+  const remainingPlannedLabs = chapter.labs.filter((_, i) => !hiddenPlanned.has(i));
 
   return (
     <main id="main" className="min-h-svh bg-background text-foreground">
@@ -237,22 +240,28 @@ export function ChapterView({
           {/* Labs */}
           <section className="mt-12">
             <SectionLabel>labs</SectionLabel>
-            {labsForChapter(course.slug, chapter.slug).map((labId) => (
-              <LabHost key={labId} labId={labId} />
+            {labsForChapter(course.slug, chapter.slug).map((lab) => (
+              <LabHost key={lab.id} labId={lab.id} />
             ))}
-            <p className="mt-6 font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-muted-foreground">
-              planned
-            </p>
-            <ul className="mt-3 space-y-2 font-mono text-xs leading-6 text-muted-foreground">
-              {chapter.labs.map((lab, i) => (
-                <li key={i} className="flex gap-2.5">
-                  <span className="text-border" aria-hidden="true">
-                    □
-                  </span>
-                  {lab}
-                </li>
-              ))}
-            </ul>
+            {remainingPlannedLabs.length > 0 && (
+              <>
+                {shippedLabs.length > 0 && (
+                  <p className="mt-6 font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-muted-foreground">
+                    planned
+                  </p>
+                )}
+                <ul className="mt-3 space-y-2 font-mono text-xs leading-6 text-muted-foreground">
+                  {remainingPlannedLabs.map((lab, i) => (
+                    <li key={i} className="flex gap-2.5">
+                      <span className="text-border" aria-hidden="true">
+                        □
+                      </span>
+                      {lab}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
           </section>
 
           {/* References */}

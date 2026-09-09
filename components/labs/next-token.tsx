@@ -1,18 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { LabShell } from "./lab-shell";
+import { baseTokenProbs, sampleToken, shapeDistribution } from "./models";
 import { LabBar, LabSlider, fmt1 } from "./ui";
-
-/** Illustrative next-token distribution for "The capital of France is ___". */
-const baseTokens = [
-  { token: "Paris", p: 0.62 },
-  { token: "Lyon", p: 0.18 },
-  { token: "Marseille", p: 0.09 },
-  { token: "Nice", p: 0.06 },
-  { token: "Toulouse", p: 0.03 },
-  { token: "Bordeaux", p: 0.02 },
-];
 
 /**
  * Next-Token Playground (llm-engineering ch. 1). Temperature reshapes the
@@ -24,38 +15,10 @@ export function NextToken() {
   const [draws, setDraws] = useState<Record<string, number>>({});
   const [totalDraws, setTotalDraws] = useState(0);
 
-  const shaped = useMemo(() => {
-    // Temperature: p_i^(1/T), renormalized. Top-p: keep smallest nucleus ≥ p.
-    const scaled = baseTokens.map((t) => ({
-      ...t,
-      w: Math.pow(t.p, 1 / Math.max(temp, 0.05)),
-    }));
-    const z = scaled.reduce((s, t) => s + t.w, 0);
-    const normed = scaled.map((t) => ({ ...t, p: t.w / z }));
-    const kept: typeof normed = [];
-    let cum = 0;
-    for (const t of normed) {
-      kept.push(t);
-      cum += t.p;
-      if (cum >= topP) break;
-    }
-    const z2 = kept.reduce((s, t) => s + t.p, 0);
-    return kept.map((t) => ({ ...t, p: t.p / z2, cut: false })).concat(
-      normed.slice(kept.length).map((t) => ({ ...t, p: 0, cut: true })),
-    );
-  }, [temp, topP]);
+  const shaped = shapeDistribution(baseTokenProbs, temp, topP);
 
   function sample() {
-    const live = shaped.filter((t) => !t.cut);
-    let x = Math.random();
-    let pick = live[live.length - 1].token;
-    for (const t of live) {
-      x -= t.p;
-      if (x <= 0) {
-        pick = t.token;
-        break;
-      }
-    }
+    const pick = sampleToken(shaped);
     setDraws((d) => ({ ...d, [pick]: (d[pick] ?? 0) + 1 }));
     setTotalDraws((n) => n + 1);
   }

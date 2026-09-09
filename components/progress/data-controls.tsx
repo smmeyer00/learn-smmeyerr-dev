@@ -3,8 +3,10 @@
 import { useRef, useState } from "react";
 import {
   exportProgressJson,
+  hasProgressData,
   importProgressJson,
   resetProgress,
+  useProgress,
 } from "@/lib/progress";
 
 const buttonClass =
@@ -16,9 +18,11 @@ const buttonClass =
  * schema migration so foreign or stale files can never corrupt state.
  */
 export function DataControls() {
+  const progress = useProgress();
   const fileRef = useRef<HTMLInputElement>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [confirmingReset, setConfirmingReset] = useState(false);
+  const [pendingImport, setPendingImport] = useState<string | null>(null);
 
   function onExport() {
     const blob = new Blob([exportProgressJson()], {
@@ -33,12 +37,23 @@ export function DataControls() {
     setMessage("exported progress as JSON");
   }
 
+  function runImport(text: string) {
+    const result = importProgressJson(text);
+    setPendingImport(null);
+    setMessage(
+      result.ok ? "imported progress" : `import failed: ${result.error}`,
+    );
+  }
+
   function onImportFile(file: File) {
     file.text().then((text) => {
-      const result = importProgressJson(text);
-      setMessage(
-        result.ok ? "imported progress" : `import failed: ${result.error}`,
-      );
+      // Replacing real history needs the same confirmation as reset.
+      if (hasProgressData(progress) && pendingImport === null) {
+        setPendingImport(text);
+        setMessage("import will replace current progress — confirm below");
+        return;
+      }
+      runImport(text);
     });
   }
 
@@ -105,6 +120,27 @@ export function DataControls() {
           </button>
         )}
       </div>
+      {pendingImport !== null && (
+        <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2" role="group" aria-label="confirm import">
+          <button
+            type="button"
+            onClick={() => runImport(pendingImport)}
+            className="cursor-pointer font-mono text-[0.6875rem] text-destructive underline decoration-border underline-offset-4 transition-colors hover:text-foreground"
+          >
+            [ confirm — replace my progress ]
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setPendingImport(null);
+              setMessage("import cancelled");
+            }}
+            className={buttonClass}
+          >
+            [ keep mine ]
+          </button>
+        </div>
+      )}
       {message && (
         <p role="status" className="mt-3 font-mono text-[0.6875rem] text-primary">
           {message}

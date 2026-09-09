@@ -240,7 +240,7 @@ export function MockWorkspace() {
         </div>
         {saved && (
           <p role="status" className="mt-3 font-mono text-xs text-primary">
-            saved ✓ — redo the weakest axis after 48 hours without reviewing your notes.
+            saved ✓ — weak mocks (≤ 2) join the redo queue on /drills; redo the weakest axis after 48 hours.
           </p>
         )}
       </section>
