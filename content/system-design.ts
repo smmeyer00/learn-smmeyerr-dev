@@ -1,4 +1,5 @@
 import type { Course } from "./types";
+import { systemDesignStudyGuides } from "./study-guides/system-design";
 
 export const systemDesign: Course = {
   slug: "system-design",
@@ -6,7 +7,7 @@ export const systemDesign: Course = {
   title: "System design for software engineers",
   description:
     "Build senior-level design judgment, then pressure-test it on AI-native infrastructure.",
-  scope: "15 chapters · ~56 hours",
+  scope: "15 chapters · ~56 hours of practice",
   phaseOrder: [
     "Foundations",
     "Distributed core",
@@ -19,6 +20,7 @@ export const systemDesign: Course = {
     {
       slug: "01-system-design-foundations",
       order: 1,
+      studyGuide: systemDesignStudyGuides[1],
       title: "System design foundations",
       phase: "Foundations",
       hours: 3,
@@ -126,6 +128,7 @@ export const systemDesign: Course = {
     {
       slug: "02-networking-apis-and-boundaries",
       order: 2,
+      studyGuide: systemDesignStudyGuides[2],
       title: "Networking, APIs & boundaries",
       phase: "Foundations",
       hours: 3,
@@ -202,22 +205,22 @@ export const systemDesign: Course = {
       quiz: [
         {
           question: "Best default for one-way incremental text to a browser?",
-          options: ["SSE", "UDP", "Polling every 50ms", "A database trigger"],
+          options: ["SSE", "WebSockets", "Repeated short polling", "A direct gRPC stream without browser-compatible transport"],
           answer: 0,
           explanation:
-            "SSE is HTTP-friendly, reconnection-aware, and purpose-built for server-to-client events.",
+            "SSE fits one-way server events over HTTP. WebSockets add bidirectional session machinery; repeated polling adds request overhead, and browser gRPC needs a compatible transport or gateway. Application replay and deduplication still need an explicit contract.",
         },
         {
           question: "Where should write deduplication happen?",
           options: [
             "Only in the browser",
             "At the side-effect boundary",
-            "In DNS",
-            "Nowhere if timeout is short",
+            "Only in a temporary edge cache",
+            "Only by sending the same payload again",
           ],
           answer: 1,
           explanation:
-            "The component committing the effect has the authoritative view needed to enforce an idempotency key.",
+            "The component committing the effect must enforce the idempotency contract. Client state and temporary edge caches can disappear or be bypassed, while equal payloads can also represent legitimate separate operations.",
         },
       ],
       labs: [
@@ -229,6 +232,7 @@ export const systemDesign: Course = {
     {
       slug: "03-data-modeling-and-storage",
       order: 3,
+      studyGuide: systemDesignStudyGuides[3],
       title: "Data modeling & storage",
       phase: "Foundations",
       hours: 4,
@@ -333,6 +337,7 @@ export const systemDesign: Course = {
     {
       slug: "04-caching-and-performance",
       order: 4,
+      studyGuide: systemDesignStudyGuides[4],
       title: "Caching & performance",
       phase: "Foundations",
       hours: 3,
@@ -437,6 +442,7 @@ export const systemDesign: Course = {
     {
       slug: "05-queues-streams-and-async",
       order: 5,
+      studyGuide: systemDesignStudyGuides[5],
       title: "Queues, streams & async systems",
       phase: "Distributed core",
       hours: 4,
@@ -546,6 +552,7 @@ export const systemDesign: Course = {
     {
       slug: "06-distributed-systems-fundamentals",
       order: 6,
+      studyGuide: systemDesignStudyGuides[6],
       title: "Distributed systems fundamentals",
       phase: "Distributed core",
       hours: 4,
@@ -656,6 +663,7 @@ export const systemDesign: Course = {
     {
       slug: "07-reliability-and-resilience",
       order: 7,
+      studyGuide: systemDesignStudyGuides[7],
       title: "Reliability & resilience",
       phase: "Production",
       hours: 3,
@@ -761,6 +769,7 @@ export const systemDesign: Course = {
     {
       slug: "08-observability-and-operations",
       order: 8,
+      studyGuide: systemDesignStudyGuides[8],
       title: "Observability & operations",
       phase: "Production",
       hours: 3,
@@ -871,6 +880,7 @@ export const systemDesign: Course = {
     {
       slug: "09-security-and-abuse-resistance",
       order: 9,
+      studyGuide: systemDesignStudyGuides[9],
       title: "Security & abuse resistance",
       phase: "Production",
       hours: 3,
@@ -981,6 +991,7 @@ export const systemDesign: Course = {
     {
       slug: "10-multi-region-and-global-systems",
       order: 10,
+      studyGuide: systemDesignStudyGuides[10],
       title: "Multi-region & global systems",
       phase: "Global scale",
       hours: 3,
@@ -1091,6 +1102,7 @@ export const systemDesign: Course = {
     {
       slug: "11-high-scale-compute-systems",
       order: 11,
+      studyGuide: systemDesignStudyGuides[11],
       title: "High-scale compute systems",
       phase: "AI systems",
       hours: 4,
@@ -1201,6 +1213,7 @@ export const systemDesign: Course = {
     {
       slug: "12-ai-flavored-system-design",
       order: 12,
+      studyGuide: systemDesignStudyGuides[12],
       title: "AI / LLM–flavored system design",
       phase: "AI systems",
       hours: 5,
@@ -1310,6 +1323,7 @@ export const systemDesign: Course = {
     {
       slug: "13-common-interview-design-problems",
       order: 13,
+      studyGuide: systemDesignStudyGuides[13],
       title: "Common interview design problems",
       phase: "Interview mode",
       hours: 6,
@@ -1419,6 +1433,7 @@ export const systemDesign: Course = {
     {
       slug: "14-deep-dive-tradeoff-drills",
       order: 14,
+      studyGuide: systemDesignStudyGuides[14],
       title: "Deep-dive tradeoff drills",
       phase: "Interview mode",
       hours: 4,
@@ -1529,6 +1544,7 @@ export const systemDesign: Course = {
     {
       slug: "15-interview-execution-framework",
       order: 15,
+      studyGuide: systemDesignStudyGuides[15],
       title: "Interview execution framework",
       phase: "Interview mode",
       hours: 4,

@@ -5,14 +5,15 @@ import { glossary, slugifyTerm } from "@/content/glossary";
 
 export const metadata: Metadata = {
   title: "Glossary | Learn",
-  description: "Durable systems and LLM engineering concepts in plain language.",
+  description:
+    "Durable systems and LLM engineering concepts in plain language.",
   alternates: { canonical: "/glossary" },
 };
 
 export default function GlossaryPage() {
   return (
     <main id="main" className="min-h-svh bg-background text-foreground">
-      <div className="mx-auto min-h-svh max-w-6xl px-4 sm:px-6">
+      <div className="mx-auto min-h-svh max-w-6xl px-4 pb-24 sm:px-6">
         <SiteHeader trail={[{ label: "glossary" }]} />
 
         <div className="mx-auto max-w-3xl py-10 sm:py-14">

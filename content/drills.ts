@@ -362,7 +362,7 @@ export const fluencyPrompts: { minutes: number; prompt: string }[] = [
   { minutes: 1, prompt: "KV cache in one minute: what it stores and why context costs memory." },
   { minutes: 2, prompt: "Quorum math on a napkin: N=5, and what breaks at R=2, W=2." },
   { minutes: 1, prompt: "What temperature actually does — distribution first, vibes never." },
-  { minutes: 2, prompt: "Tell the cache-stampede story: one expiry, ten thousand queries." },
+  { minutes: 2, prompt: "Explain a cache stampede: at 10k RPS, a 30% hot-key share, and 200ms recompute, what piles up?" },
   { minutes: 2, prompt: "Your hardest production incident in STAR shape: situation, decision, outcome." },
   { minutes: 5, prompt: "Full design talkthrough: pick any drill scenario and run the 50-minute arc out loud." },
 ];

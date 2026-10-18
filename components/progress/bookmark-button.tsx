@@ -24,7 +24,7 @@ export function BookmarkButton({
       type="button"
       onClick={() => toggleBookmark(key)}
       aria-pressed={saved}
-      className="cursor-pointer font-mono text-xs underline decoration-border underline-offset-4 transition-colors hover:text-primary"
+      className="min-h-11 cursor-pointer font-mono text-xs underline decoration-border underline-offset-4 transition-colors hover:text-primary"
     >
       {saved ? (
         <span>

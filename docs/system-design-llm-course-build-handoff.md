@@ -8,6 +8,12 @@
 
 **Important:** This document is the canonical handoff, not a request to clone the prototype pixel-for-pixel. Preserve the curriculum and learning intent, but improve the information architecture, interaction quality, pedagogy, content depth, accessibility, and implementation.
 
+**October 2026 supplement:** `content/study-guides/` now supplies original
+worked examples, assignments, rubrics, recall checks, and selected primary
+sources for all 36 chapters. Study budgets include those activities and
+repeated drills. Planned interaction briefs here remain internal ideas;
+public pages show live labs and usable assignments.
+
 ---
 
 ## 1. Executive brief

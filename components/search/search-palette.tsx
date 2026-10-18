@@ -2,14 +2,36 @@
 
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
-import { searchEntries, type SearchEntry } from "@/lib/search";
+import { searchEntries, type SearchEntry } from "@/lib/search-matching";
+import { useHydrated } from "@/lib/use-hydrated";
 
 const kindLabel: Record<SearchEntry["kind"], string> = {
   chapter: "chapter",
   glossary: "glossary",
   drill: "drill",
   manual: "manual",
+  guide: "study guide",
 };
+
+const OPEN_SEARCH = "learn:open-search";
+
+/** A small header island opens the shared palette without importing its index. */
+export function SearchButton() {
+  const hydrated = useHydrated();
+  return (
+    <button
+      type="button"
+      aria-label="search courses"
+      aria-keyshortcuts="meta+k control+k"
+      disabled={!hydrated}
+      title="Search (⌘ / Ctrl K)"
+      onClick={() => window.dispatchEvent(new Event(OPEN_SEARCH))}
+      className="min-h-11 cursor-pointer rounded border px-2 font-mono text-xs text-muted-foreground hover:border-primary/50 hover:text-primary"
+    >
+      search
+    </button>
+  );
+}
 
 /**
  * Command/search palette across chapters, glossary, drills, and manual.
@@ -21,7 +43,7 @@ export function SearchPalette({ index }: { index: SearchEntry[] }) {
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const wasOpen = useRef(false);
   const listId = useId();
@@ -29,6 +51,10 @@ export function SearchPalette({ index }: { index: SearchEntry[] }) {
 
   useEffect(() => {
     function openPalette() {
+      triggerRef.current =
+        document.activeElement instanceof HTMLElement
+          ? document.activeElement
+          : null;
       setQuery("");
       setActive(0);
       setOpen(true);
@@ -42,7 +68,11 @@ export function SearchPalette({ index }: { index: SearchEntry[] }) {
       }
     }
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener(OPEN_SEARCH, openPalette);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener(OPEN_SEARCH, openPalette);
+    };
   }, []);
 
   useEffect(() => {
@@ -57,24 +87,7 @@ export function SearchPalette({ index }: { index: SearchEntry[] }) {
     }
   }, [open]);
 
-  if (!open) {
-    return (
-      <button
-        ref={triggerRef}
-        type="button"
-        onClick={() => {
-          setQuery("");
-          setActive(0);
-          setOpen(true);
-        }}
-        aria-keyshortcuts="meta+k control+k"
-        className="fixed bottom-5 right-5 z-40 cursor-pointer rounded-md border border-border bg-secondary/90 px-3 py-1.5 font-mono text-[0.6875rem] text-muted-foreground shadow-lg backdrop-blur transition-colors hover:border-primary/50 hover:text-foreground"
-      >
-        [ search ]
-        <span className="ml-2">⌘K</span>
-      </button>
-    );
-  }
+  if (!open) return null;
 
   return (
     <div
@@ -94,7 +107,7 @@ export function SearchPalette({ index }: { index: SearchEntry[] }) {
           if (e.key !== "Tab" || !dialogRef.current) return;
           const focusables = Array.from(
             dialogRef.current.querySelectorAll<HTMLElement>(
-              'a[href], button:not([disabled]), input:not([disabled])',
+              "a[href], button:not([disabled]), input:not([disabled])",
             ),
           ).filter((el) => el.offsetParent !== null);
           if (focusables.length === 0) return;
@@ -144,13 +157,17 @@ export function SearchPalette({ index }: { index: SearchEntry[] }) {
             type="button"
             onClick={() => setOpen(false)}
             aria-label="close search"
-            className="cursor-pointer font-mono text-[0.6875rem] text-muted-foreground hover:text-foreground"
+            className="min-h-11 min-w-11 cursor-pointer font-mono text-xs text-muted-foreground hover:text-foreground"
           >
             esc
           </button>
         </div>
         {results.length > 0 ? (
-          <ul id={listId} role="listbox" className="max-h-[50vh] overflow-y-auto p-2">
+          <ul
+            id={listId}
+            role="listbox"
+            className="max-h-[50vh] overflow-y-auto p-2"
+          >
             {results.map((entry, i) => (
               <li
                 key={`${entry.kind}-${entry.href}`}
@@ -183,7 +200,9 @@ export function SearchPalette({ index }: { index: SearchEntry[] }) {
           </ul>
         ) : (
           <p className="px-4 py-6 font-mono text-xs text-muted-foreground">
-            {query.trim() ? "no matches — try fewer words" : "type to search chapters, glossary, drills + manual"}
+            {query.trim()
+              ? "no matches — try fewer words"
+              : "type to search chapters, glossary, drills + manual"}
           </p>
         )}
       </div>

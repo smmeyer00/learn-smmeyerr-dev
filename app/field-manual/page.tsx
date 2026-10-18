@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function FieldManualPage() {
   return (
     <main id="main" className="min-h-svh bg-background text-foreground">
-      <div className="mx-auto min-h-svh max-w-6xl px-4 sm:px-6">
+      <div className="mx-auto min-h-svh max-w-6xl px-4 pb-24 sm:px-6">
         <SiteHeader trail={[{ label: "field-manual" }]} />
 
         <div className="mx-auto max-w-3xl py-10 sm:py-14">
@@ -27,8 +27,30 @@ export default function FieldManualPage() {
             print-clean.
           </p>
 
+          <nav
+            aria-label="field manual sections"
+            className="mt-6 border-y py-3"
+          >
+            <ul className="flex flex-wrap gap-x-6">
+              {fieldManual.map((section) => (
+                <li key={section.id}>
+                  <a
+                    href={"#" + section.id}
+                    className="inline-flex min-h-11 items-center text-sm text-primary underline underline-offset-4"
+                  >
+                    {section.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
           {fieldManual.map((section) => (
-            <section key={section.id} id={section.id} className="mt-12 scroll-mt-20">
+            <section
+              key={section.id}
+              id={section.id}
+              className="mt-12 scroll-mt-20"
+            >
               <h2 className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-primary">
                 {section.title}
               </h2>

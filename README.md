@@ -5,17 +5,32 @@ accounts, no backend, progress stored locally in the browser.
 
 ## Current state
 
-Two full courses are published as static content:
+Two courses are included as statically rendered content:
 
-| Course | Chapters | Est. time | Route |
+| Course | Chapters | Suggested practice budget | Route |
 | --- | --- | --- | --- |
 | System design for software engineers | 15 | ~56h | `/system-design` |
 | LLM engineering for software engineers | 21 | ~73h | `/llm-engineering` |
 
-Every chapter renders from structured TypeScript content with the full
-learning loop: outcome → why it matters → coverage map → mental model →
-lessons → senior signal → failure patterns → interview drill → knowledge
-checks → planned labs → references.
+Every chapter renders from structured TypeScript content: outcome and study
+plan → mental model → lessons → worked example → optional live lab →
+assignment and constraint variations → rubric → knowledge checks →
+closed-book recall → interview drill → references and personal notes.
+
+The hours include independent assignments, variations, repeated drills, and
+review. Each chapter provides a four-block time budget; reading is only its
+first block. Every chapter has an original worked example, an assignment
+with a concrete deliverable, a self-review rubric, two recall prompts with
+sample reasoning, and selected primary references. Exercises can be done
+with paper and a text editor; paid model or cloud access is optional.
+
+`/about-this-course` explains prerequisites, the study loop, an alternating
+sequence across the tracks, local progress, and the source/update policy.
+Course roadmaps group chapters by phase; chapter pages include section links.
+Logged chapter practice joins a review queue on the home page and roadmap:
+scores 1–2 return immediately, stronger practice returns after 48 hours, and
+missed quiz answers prompt review. Completing a chapter points directly to
+the next unfinished chapter in that track.
 
 Outstanding work is tracked in [`TODO.md`](./TODO.md); parked ideas live
 in [`docs/ROADMAP.md`](./docs/ROADMAP.md). If you are an agent starting a
@@ -37,6 +52,9 @@ new session, read [`AGENTS.md`](./AGENTS.md) first.
 app/
   page.tsx                  # course index (/)
   layout.tsx                # root layout, dark theme, metadata, search index
+  about-this-course/page.tsx # audience, study sequence, budgets, local data
+  not-found.tsx             # branded 404 with course/search recovery
+  opengraph-image.tsx        # static social preview generated at build time
   glossary/page.tsx         # glossary reference
   drills/page.tsx           # interview drill deck
   mock/page.tsx             # 50-minute mock workspace
@@ -55,13 +73,17 @@ content/
   types.ts                  # Course / Chapter schema
   system-design.ts          # course content (15 chapters)
   llm-engineering.ts        # course content (21 chapters)
+  study-guides/             # 36 worked examples, assignments, rubrics, recall
+  references.ts             # selected primary sources with review months
   drills.ts                 # 20 scenarios, constraint decks, mock structure
   field-manual.ts           # formulas, budgets, metrics, checklist, FACT
   glossary.ts               # durable concepts with chapter deep links
   index.ts                  # registry + lookup helpers
 lib/
   progress.ts               # versioned localStorage store + actions
-  search.ts                 # build-time index + fuzzy matching
+  search.ts                 # build-time search index
+  search-matching.ts        # browser matcher, isolated from curriculum imports
+  study.ts                  # next unfinished chapter + chapter review queue
 scripts/
   validate-content.ts       # CI content invariants (pnpm validate)
   check-links.ts            # on-demand reference URL check (pnpm check-links)
@@ -97,6 +119,11 @@ pnpm start  # Serve the production build
 pnpm exec playwright test  # Highest-value e2e flows (CI)
 ```
 
+In a restricted local sandbox that blocks Turbopack's PostCSS worker IPC,
+`pnpm build --webpack` builds the same static routes with webpack. Report
+that distinction when recording deployment checks; the default build stays
+on Turbopack.
+
 ## Deploy
 
 `metadataBase` is `https://learn.smmeyer.dev` with per-page canonicals.
@@ -119,15 +146,20 @@ a chapter must satisfy, and how to add or revise a chapter.
 - Aesthetic: monospace meta labels, terminal-flavored details, generous
   spacing, prose at a readable measure. Keep new pages consistent with
   `components/course/chapter-view.tsx`.
-- Reveals (drill approaches, quiz answers) use native
-  `<details>`/`<summary>`: no client JS, keyboard accessible, respects
-  reduced motion. Answers must never be visible in the static HTML before the
-  reveal.
+- Drill approaches and lab takeaways use native `<details>`/`<summary>`.
+  Labs capture a prediction before exposing controls and results. Recall
+  checks require a written attempt before showing sample reasoning. Answers
+  are visually hidden until revealed; serialized answer data is inspectable.
+  Interactions stay keyboard accessible and respect reduced motion.
 
 ## Curriculum provenance
 
-The course content is ported from
+The baseline course content is ported from
 `docs/system-design-llm-course-build-handoff.md`, which remains the canonical
 source for curriculum intent, interaction briefs, and the build plan. Content
 was ported into structured TypeScript; a small number of garbled fragments in
-the source were normalized without changing meaning.
+the source were normalized without changing meaning. The October 2026 study
+guides supplement that baseline with original teaching scenarios and
+assignments, preserving its coverage and chapter URLs. Example values are
+illustrative; linked documentation supplies deeper context and current
+provider contracts.

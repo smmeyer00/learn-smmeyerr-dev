@@ -6,7 +6,7 @@
  *
  * Run before deploy: pnpm check-links
  */
-import { courses } from "../content/index";
+import { courses, getChapterReferences } from "../content/index";
 
 const TIMEOUT_MS = 15_000;
 const CONCURRENCY = 5;
@@ -25,7 +25,8 @@ async function check(href: string, where: string): Promise<Result> {
       // Drain so keep-alive sockets don't hang the process.
       await res.arrayBuffer().catch(() => undefined);
       if (res.ok) return { href, where, ok: true, detail: String(res.status) };
-      if (attempt === 2) return { href, where, ok: false, detail: `HTTP ${res.status}` };
+      if (attempt === 2)
+        return { href, where, ok: false, detail: `HTTP ${res.status}` };
     } catch (err) {
       if (attempt === 2) {
         const msg = err instanceof Error ? err.message : String(err);
@@ -40,7 +41,7 @@ async function check(href: string, where: string): Promise<Result> {
 const targets: { href: string; where: string }[] = [];
 for (const course of courses) {
   for (const chapter of course.chapters) {
-    for (const ref of chapter.references ?? []) {
+    for (const ref of getChapterReferences(chapter)) {
       targets.push({ href: ref.href, where: `${course.slug}/${chapter.slug}` });
     }
   }
@@ -62,10 +63,15 @@ async function main(): Promise<void> {
   }
 
   const failed = results.filter((r) => !r.ok);
-  console.log(`\n${results.length - failed.length}/${results.length} links alive`);
+  console.log(
+    `\n${results.length - failed.length}/${results.length} links alive`,
+  );
   if (failed.length > 0) {
-    console.error("dead or blocked links (verify by hand, then update or drop):");
-    for (const r of failed) console.error(`  - ${r.href} (${r.where}): ${r.detail}`);
+    console.error(
+      "dead or blocked links (verify by hand, then update or drop):",
+    );
+    for (const r of failed)
+      console.error(`  - ${r.href} (${r.where}): ${r.detail}`);
     process.exit(1);
   }
 }

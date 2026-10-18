@@ -8,7 +8,14 @@ import { courses } from "../content/index";
  * whole course by hand — templates are verified through every chapter.
  */
 
-const urls: string[] = ["/", "/drills", "/mock", "/field-manual", "/glossary"];
+const urls: string[] = [
+  "/",
+  "/about-this-course",
+  "/drills",
+  "/mock",
+  "/field-manual",
+  "/glossary",
+];
 for (const course of courses) {
   urls.push(`/${course.slug}`);
   for (const chapter of course.chapters) {
@@ -29,6 +36,23 @@ test.describe("route crawl", () => {
       expect(response?.status(), `${url} status`).toBe(200);
       await expect(page.locator("#main")).toBeAttached();
       await expect(page.locator("h1").first()).toBeVisible();
+      if (url.split("/").length === 3) {
+        await expect(
+          page.getByRole("heading", { name: "worked example", exact: true }),
+        ).toBeVisible();
+        await expect(
+          page.getByRole("heading", { name: "assignment", exact: true }),
+        ).toBeVisible();
+        await expect(page.locator("#references a").first()).toHaveAttribute(
+          "href",
+          /^https:\/\//,
+        );
+        await expect(
+          page.getByText(
+            /Base mental-model animation|Architecture Skeleton — constrained canvas/,
+          ),
+        ).toHaveCount(0);
+      }
       expect(errors, `${url} console/page errors`).toEqual([]);
     });
   }

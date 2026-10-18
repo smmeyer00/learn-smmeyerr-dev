@@ -16,17 +16,28 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://learn.smmeyer.dev"),
-  title: "Courses | Learn",
-  description: "Compact technical courses and working notes by Steven Meyer.",
+  title: "Free System Design & LLM Engineering Courses | Learn",
+  description:
+    "Free technical study paths by Steven Meyer, with worked examples, interactive labs, design assignments, and interview practice. No account required.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Courses | Learn",
-    description: "Compact technical courses and working notes by Steven Meyer.",
+    title: "System Design & LLM Engineering | Learn",
+    description:
+      "Free study paths with worked examples, labs, assignments, and interview practice by Steven Meyer.",
     url: "/",
     siteName: "Learn",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: [
+      {
+        url: "/opengraph-image",
+        alt: "Free system design and LLM engineering study paths by Steven Meyer",
+      },
+    ],
   },
 };
 

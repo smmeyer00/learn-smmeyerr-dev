@@ -1,7 +1,9 @@
 import Link from "next/link";
-import type { Chapter, Course } from "@/content";
+import type { ReactNode } from "react";
+import { getChapterReferences, type Chapter, type Course } from "@/content";
 import { BookmarkButton } from "@/components/progress/bookmark-button";
 import { ChapterNotes } from "@/components/progress/chapter-notes";
+import { RecallPractice } from "@/components/progress/recall-practice";
 import { SiteHeader } from "@/components/site-header";
 import { LabHost } from "@/components/labs/host";
 import { labsForChapter } from "@/components/labs/registry";
@@ -9,43 +11,53 @@ import { MarkComplete } from "@/components/progress/mark-complete";
 import { Quiz } from "@/components/progress/quiz";
 import { TrackVisit } from "@/components/progress/track-visit";
 
-function SectionLabel({ children }: { children: string }) {
+const labelClass = "font-mono text-xs uppercase tracking-[0.12em] text-primary";
+const proseClass = "mt-3 text-base leading-7 text-foreground/90";
+
+function Section({
+  id,
+  title,
+  children,
+}: {
+  id: string;
+  title: string;
+  children: ReactNode;
+}) {
   return (
-    <h2 className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-primary">
+    <section id={id} className="mt-12 scroll-mt-6">
+      <h2 className={labelClass}>{title}</h2>
       {children}
-    </h2>
+    </section>
   );
 }
 
 function FlowDiagram({ chapter }: { chapter: Chapter }) {
   return (
-    <div className="mt-4">
-      <ol className="flex flex-wrap items-stretch gap-x-2 gap-y-2">
-        {chapter.mentalModel.flow.map((step, i) => (
-          <li key={step.label} className="flex items-stretch gap-2">
-            <div className="rounded-md border border-border bg-secondary/60 px-3 py-2">
-              <p className="font-mono text-xs font-medium text-foreground">
-                {step.label}
-              </p>
-              <p className="mt-0.5 font-mono text-[0.6875rem] leading-4 text-muted-foreground">
-                {step.detail}
-              </p>
-            </div>
-            {i < chapter.mentalModel.flow.length - 1 && (
-              <span
-                aria-hidden="true"
-                className="self-center font-mono text-xs text-primary"
-              >
-                →
-              </span>
-            )}
+    <figure className="mt-4">
+      <ol className="grid gap-2 sm:grid-cols-2">
+        {chapter.mentalModel.flow.map((step, index) => (
+          <li
+            key={step.label}
+            className="border-l-2 border-primary/40 bg-secondary/40 px-3 py-3"
+          >
+            <p className="font-mono text-sm text-foreground">
+              <span className="mr-2 text-primary">{index + 1} →</span>
+              {step.label}
+            </p>
+            <p className="mt-1 text-sm leading-6 text-muted-foreground">
+              {step.detail}
+            </p>
           </li>
         ))}
       </ol>
-      <p className="mt-3 font-mono text-[0.6875rem] text-muted-foreground">
-        base flow: {chapter.mentalModel.flow.map((s) => s.label.toLowerCase()).join(" → ")}
-      </p>
-    </div>
+      <figcaption className="mt-3 text-xs leading-5 text-muted-foreground">
+        Read in numbered order:{" "}
+        {chapter.mentalModel.flow
+          .map((step) => step.label.toLowerCase())
+          .join(" → ")}
+        .
+      </figcaption>
+    </figure>
   );
 }
 
@@ -56,298 +68,376 @@ export function ChapterView({
   course: Course;
   chapter: Chapter;
 }) {
-  const index = course.chapters.findIndex((c) => c.slug === chapter.slug);
-  const prev = index > 0 ? course.chapters[index - 1] : undefined;
-  const next = index < course.chapters.length - 1 ? course.chapters[index + 1] : undefined;
-  const shippedLabs = labsForChapter(course.slug, chapter.slug);
-  const hiddenPlanned = new Set(shippedLabs.flatMap((lab) => lab.replacesPlanned));
-  const remainingPlannedLabs = chapter.labs.filter((_, i) => !hiddenPlanned.has(i));
+  const index = course.chapters.findIndex((item) => item.slug === chapter.slug);
+  const prev = course.chapters[index - 1];
+  const next = course.chapters[index + 1];
+  const labs = labsForChapter(course.slug, chapter.slug);
+  const guide = chapter.studyGuide;
+  const references = getChapterReferences(chapter);
+  const contents = [
+    ["chapter-start", "outcome + study plan"],
+    ["mental-model", "mental model"],
+    ["lessons", "lessons"],
+    ["worked-example", "worked example"],
+    ...(labs.length ? [["labs", "interactive lab"]] : []),
+    ["assignment", "assignment + rubric"],
+    ["knowledge-checks", "knowledge checks"],
+    ["retrieval", "closed-book recall"],
+    ["interview-drill", "interview drill"],
+    ["references", "references"],
+    ["notes", "notes + next chapter"],
+  ];
+  const sectionLinks = (
+    <ol className="mt-3 space-y-1">
+      {contents.map(([id, label]) => (
+        <li key={id}>
+          <a
+            href={"#" + id}
+            className="inline-flex min-h-9 items-center py-1 text-sm text-muted-foreground hover:text-primary"
+          >
+            {label}
+          </a>
+        </li>
+      ))}
+    </ol>
+  );
 
   return (
     <main id="main" className="min-h-svh bg-background text-foreground">
       <TrackVisit courseSlug={course.slug} chapterSlug={chapter.slug} />
-      <div className="mx-auto min-h-svh max-w-6xl px-4 sm:px-6">
+      <div className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
         <SiteHeader
           trail={[
-            { label: course.slug, href: `/${course.slug}` },
+            { label: course.slug, href: "/" + course.slug },
             { label: String(chapter.order).padStart(2, "0") },
           ]}
         />
-
-        <div className="mx-auto max-w-3xl py-10 sm:py-14">
-          {/* Chapter heading */}
-          <div className="flex items-baseline justify-between border-b pb-3 font-mono text-xs">
-            <p className="text-primary">
-              {course.slug}/{String(chapter.order).padStart(2, "0")}
-            </p>
-            <p className="text-muted-foreground">
-              {chapter.phase.toLowerCase()} <span className="text-border" aria-hidden="true">{"//"}</span>{" "}
-              {chapter.depth} <span className="text-border" aria-hidden="true">{"//"}</span> {chapter.hours}h
-            </p>
-          </div>
-
-          <h1 className="mt-8 text-3xl font-medium tracking-[-0.035em] sm:text-4xl">
-            {chapter.title}
-          </h1>
-
-          {/* Outcome */}
-          <div className="mt-8 border-l-2 border-primary/60 pl-4">
-            <SectionLabel>outcome</SectionLabel>
-            <p className="mt-2 text-[0.9375rem] leading-7 text-foreground">
-              {chapter.outcome}
-            </p>
-          </div>
-
-          {/* Why this matters */}
-          <section className="mt-12">
-            <SectionLabel>why this matters</SectionLabel>
-            <p className="mt-3 text-[0.9375rem] leading-7 text-muted-foreground">
-              {chapter.why}
-            </p>
-          </section>
-
-          {/* Coverage map */}
-          <section className="mt-12">
-            <SectionLabel>coverage</SectionLabel>
-            <dl className="mt-3 border-t font-mono text-xs leading-6">
-              {chapter.coverage.map((item, i) => (
-                <div
-                  key={i}
-                  className="grid gap-x-6 border-b py-2.5 sm:grid-cols-[5.5rem_minmax(0,1fr)]"
-                >
-                  <dt className="text-muted-foreground">
-                    {String(i + 1).padStart(2, "0")}
-                  </dt>
-                  <dd className="text-foreground/90">{item}</dd>
-                </div>
-              ))}
-            </dl>
-          </section>
-
-          {/* Mental model */}
-          <section className="mt-12">
-            <SectionLabel>mental model</SectionLabel>
-            <p className="mt-3 text-[0.9375rem] leading-7 text-foreground">
-              {chapter.mentalModel.statement}
-            </p>
-            <FlowDiagram chapter={chapter} />
-          </section>
-
-          {/* Lessons */}
-          <section className="mt-12">
-            <SectionLabel>lessons</SectionLabel>
-            <div className="mt-4 space-y-10">
-              {chapter.lessons.map((lesson, i) => (
-                <article key={lesson.title}>
-                  <h3 className="text-lg font-medium tracking-[-0.02em]">
-                    <span className="mr-3 font-mono text-xs text-muted-foreground">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    {lesson.title}
-                  </h3>
-                  {lesson.paragraphs.map((p, j) => (
-                    <p
-                      key={j}
-                      className="mt-3 text-[0.9375rem] leading-7 text-foreground/90"
-                    >
-                      {p}
-                    </p>
-                  ))}
-                  {lesson.bullets && (
-                    <ul className="mt-4 space-y-2 border-l border-border pl-4">
-                      {lesson.bullets.map((b, j) => (
-                        <li
-                          key={j}
-                          className="font-mono text-xs leading-6 text-muted-foreground"
-                        >
-                          <span className="mr-2 text-primary">·</span>
-                          {b}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </article>
-              ))}
-            </div>
-          </section>
-
-          {/* Senior signal */}
-          <section className="mt-12">
-            <div className="rounded-md border border-primary/30 bg-primary/5 p-5">
-              <SectionLabel>senior signal</SectionLabel>
-              <p className="mt-3 text-[0.9375rem] leading-7 text-foreground">
-                {chapter.seniorSignal}
-              </p>
-            </div>
-          </section>
-
-          {/* Failure patterns */}
-          <section className="mt-12">
-            <SectionLabel>failure patterns</SectionLabel>
-            <ul className="mt-3 space-y-2.5">
-              {chapter.pitfalls.map((pitfall, i) => (
-                <li
-                  key={i}
-                  className="flex gap-3 text-[0.9375rem] leading-7 text-muted-foreground"
-                >
-                  <span aria-hidden="true" className="font-mono text-xs leading-7 text-destructive">
-                    ✗
-                  </span>
-                  {pitfall}
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          {/* Drill */}
-          <section className="mt-12">
-            <SectionLabel>interview drill</SectionLabel>
-            <div className="mt-3 rounded-md border border-border p-5">
-              <p className="text-[0.9375rem] leading-7 text-foreground">
-                {chapter.drill.prompt}
-              </p>
-              <div className="mt-4 flex flex-wrap gap-1.5">
-                {chapter.drill.constraints.map((c) => (
-                  <span
-                    key={c}
-                    className="rounded border border-border bg-secondary px-2 py-0.5 font-mono text-[0.6875rem] text-muted-foreground"
-                  >
-                    {c}
-                  </span>
-                ))}
+        <div className="py-10 sm:py-14 lg:grid lg:grid-cols-[11rem_minmax(0,1fr)] lg:gap-12">
+          <aside className="mb-8 lg:mb-0">
+            <nav
+              aria-label="chapter sections"
+              className="hidden lg:sticky lg:top-6 lg:block lg:max-h-[calc(100svh-3rem)] lg:overflow-y-auto"
+            >
+              <p className={labelClass}>on this page</p>
+              {sectionLinks}
+              <Link
+                href={"/" + course.slug}
+                className="mt-5 inline-flex min-h-11 items-center text-sm text-primary underline underline-offset-4"
+              >
+                ← course roadmap
+              </Link>
+            </nav>
+            <details className="border-b pb-4 lg:hidden">
+              <summary className="min-h-11 cursor-pointer font-mono text-xs text-primary">
+                on this page
+              </summary>
+              <nav aria-label="chapter sections">{sectionLinks}</nav>
+            </details>
+          </aside>
+          <div className="min-w-0 max-w-3xl">
+            <div id="chapter-start" className="scroll-mt-6">
+              <div className="flex flex-wrap items-baseline justify-between gap-2 border-b pb-3 font-mono text-xs">
+                <p className="text-primary">
+                  {course.slug}/{String(chapter.order).padStart(2, "0")}
+                </p>
+                <p className="text-muted-foreground">
+                  {chapter.phase.toLowerCase()} · {chapter.depth} · ~
+                  {chapter.hours}h practice
+                </p>
               </div>
-              <details className="group mt-5 border-t pt-4">
-                <summary className="cursor-pointer select-none font-mono text-xs text-primary transition-colors hover:text-foreground">
-                  [ strong approach ]
+              <h1 className="mt-8 text-3xl font-medium tracking-[-0.035em] sm:text-4xl">
+                {chapter.title}
+              </h1>
+              <div className="mt-8 border-l-2 border-primary/60 pl-4">
+                <h2 className={labelClass}>outcome</h2>
+                <p className={proseClass}>{chapter.outcome}</p>
+              </div>
+              <details className="mt-6 border-y py-3">
+                <summary className="min-h-11 cursor-pointer text-sm font-medium">
+                  Plan a practice session · ~{chapter.hours}h including
+                  exercises
                 </summary>
-                <p className="mt-3 text-[0.9375rem] leading-7 text-muted-foreground">
-                  {chapter.drill.approach}
+                <dl className="mt-3 grid gap-2 text-sm">
+                  {[
+                    "Read + trace the worked example",
+                    "Assignment + constraint variations",
+                    "Timed drill + repeated explanations",
+                    "Closed-book recall + self-review",
+                  ].map((label, i) => (
+                    <div key={label} className="flex justify-between gap-4">
+                      <dt className="text-muted-foreground">{label}</dt>
+                      <dd className="shrink-0 font-mono">
+                        {guide.minutes[i]} min
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+                <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                  This is a suggested practice budget, including drawing,
+                  variations, and repeated drills. Reading is the first block.
+                  Split the work across sessions and use the rubric to judge
+                  when to move on.
                 </p>
               </details>
             </div>
-          </section>
-
-          {/* Knowledge checks */}
-          <section className="mt-12">
-            <SectionLabel>knowledge checks</SectionLabel>
-            <Quiz
-              courseSlug={course.slug}
-              chapterSlug={chapter.slug}
-              questions={chapter.quiz}
-            />
-          </section>
-
-          {/* Labs */}
-          <section className="mt-12">
-            <SectionLabel>labs</SectionLabel>
-            {labsForChapter(course.slug, chapter.slug).map((lab) => (
-              <LabHost key={lab.id} labId={lab.id} />
-            ))}
-            {remainingPlannedLabs.length > 0 && (
-              <>
-                {shippedLabs.length > 0 && (
-                  <p className="mt-6 font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-muted-foreground">
-                    planned
-                  </p>
-                )}
-                <ul className="mt-3 space-y-2 font-mono text-xs leading-6 text-muted-foreground">
-                  {remainingPlannedLabs.map((lab, i) => (
-                    <li key={i} className="flex gap-2.5">
-                      <span className="text-border" aria-hidden="true">
-                        □
+            <Section id="why" title="why this matters">
+              <p className={proseClass}>{chapter.why}</p>
+            </Section>
+            <Section id="coverage" title="coverage">
+              <ul className="mt-3 divide-y border-y">
+                {chapter.coverage.map((item) => (
+                  <li
+                    key={item}
+                    className="py-3 text-sm leading-6 text-muted-foreground"
+                  >
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </Section>
+            <Section id="mental-model" title="mental model">
+              <p className={proseClass}>{chapter.mentalModel.statement}</p>
+              <FlowDiagram chapter={chapter} />
+            </Section>
+            <Section id="lessons" title="lessons">
+              <div className="mt-4 space-y-9">
+                {chapter.lessons.map((lesson, i) => (
+                  <article key={lesson.title}>
+                    <h3 className="text-lg font-medium tracking-tight">
+                      <span className="mr-3 font-mono text-xs text-muted-foreground">
+                        {String(i + 1).padStart(2, "0")}
                       </span>
-                      {lab}
-                    </li>
-                  ))}
-                </ul>
-              </>
+                      {lesson.title}
+                    </h3>
+                    {lesson.paragraphs.map((paragraph) => (
+                      <p key={paragraph} className={proseClass}>
+                        {paragraph}
+                      </p>
+                    ))}
+                    {lesson.bullets && (
+                      <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-6 text-muted-foreground">
+                        {lesson.bullets.map((bullet) => (
+                          <li key={bullet}>{bullet}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </article>
+                ))}
+              </div>
+            </Section>
+            <Section id="worked-example" title="worked example">
+              <h3 className="mt-4 text-xl font-medium tracking-tight">
+                {guide.example.title}
+              </h3>
+              <p className={proseClass}>{guide.example.scenario}</p>
+              <ol className="mt-5 list-decimal space-y-4 pl-5 text-base leading-7 text-foreground/90">
+                {guide.example.steps.map((step) => (
+                  <li key={step} className="pl-1">
+                    {step}
+                  </li>
+                ))}
+              </ol>
+              <p className="mt-5 border-l-2 border-primary/60 pl-4 text-base leading-7">
+                <strong className="font-medium">Design decision: </strong>
+                {guide.example.decision}
+              </p>
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                <strong className="font-medium">Limit: </strong>
+                {guide.example.limitation}
+              </p>
+              <p className="mt-3 font-mono text-xs leading-5 text-muted-foreground">
+                Teaching scenario · traffic, prices, and capacity values are
+                illustrative.
+              </p>
+            </Section>
+            {labs.length > 0 && (
+              <Section id="labs" title="lab">
+                {labs.map((lab) => (
+                  <LabHost key={lab.id} labId={lab.id} />
+                ))}
+              </Section>
             )}
-          </section>
-
-          {/* References */}
-          {chapter.references && (
-            <section className="mt-12">
-              <SectionLabel>references</SectionLabel>
-              <ul className="mt-3 space-y-2 font-mono text-xs leading-6">
-                {chapter.references.map((ref) => (
+            <Section id="assignment" title="assignment">
+              <p className={proseClass}>
+                <strong className="font-medium">Produce: </strong>
+                {guide.assignment.deliverable}
+              </p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                Paper, a text editor, or a spreadsheet is enough. Model access
+                and paid services are optional.
+              </p>
+              <ol className="mt-4 list-decimal space-y-3 pl-5 text-base leading-7">
+                {guide.assignment.tasks.map((task) => (
+                  <li key={task} className="pl-1">
+                    {task}
+                  </li>
+                ))}
+              </ol>
+              <h3 className="mt-6 text-base font-medium">
+                Change a constraint
+              </h3>
+              <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-6 text-muted-foreground">
+                {guide.assignment.variations.map((variation) => (
+                  <li key={variation}>{variation}</li>
+                ))}
+              </ul>
+              <h3 className="mt-6 text-base font-medium">Self-review rubric</h3>
+              <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-6">
+                {guide.assignment.rubric.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                If a criterion is missing, revise that part of the artifact
+                before rating your practice below.
+              </p>
+            </Section>
+            <Section id="senior-signal" title="senior signal">
+              <p className="mt-3 border-l-2 border-primary/60 pl-4 text-base leading-7">
+                {chapter.seniorSignal}
+              </p>
+            </Section>
+            <Section id="failure-patterns" title="failure patterns">
+              <ul className="mt-3 list-disc space-y-2 pl-5 text-base leading-7 text-muted-foreground">
+                {chapter.pitfalls.map((pitfall) => (
+                  <li key={pitfall}>{pitfall}</li>
+                ))}
+              </ul>
+            </Section>
+            <Section id="knowledge-checks" title="knowledge checks">
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                Start with these quick checks, then explain the closed-book
+                questions in your own words.
+              </p>
+              <Quiz
+                courseSlug={course.slug}
+                chapterSlug={chapter.slug}
+                questions={chapter.quiz}
+              />
+            </Section>
+            <Section id="retrieval" title="closed-book recall">
+              <RecallPractice
+                courseSlug={course.slug}
+                chapterSlug={chapter.slug}
+                questions={guide.recall}
+              />
+            </Section>
+            <Section id="interview-drill" title="interview drill">
+              <p className={proseClass}>{chapter.drill.prompt}</p>
+              <ul
+                aria-label="drill constraints"
+                className="mt-4 flex flex-wrap gap-2"
+              >
+                {chapter.drill.constraints.map((constraint) => (
+                  <li
+                    key={constraint}
+                    className="rounded border px-2 py-1 font-mono text-xs text-muted-foreground"
+                  >
+                    {constraint}
+                  </li>
+                ))}
+              </ul>
+              <details className="mt-5 border-y py-3">
+                <summary className="min-h-11 cursor-pointer font-mono text-xs text-primary">
+                  compare a strong approach after your attempt
+                </summary>
+                <p className={proseClass}>{chapter.drill.approach}</p>
+                <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                  Compare decisions and failure behavior, then repeat with a
+                  changed constraint. Keep your own wording.
+                </p>
+              </details>
+              <Link
+                href="/mock"
+                className="mt-3 inline-flex min-h-11 items-center text-sm text-primary underline underline-offset-4"
+              >
+                Use the timed mock workspace →
+              </Link>
+            </Section>
+            <Section id="references" title="references">
+              <ul className="mt-3 space-y-2 text-sm leading-6">
+                {references.map((ref) => (
                   <li key={ref.href}>
                     <a
                       href={ref.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-muted-foreground underline decoration-border underline-offset-4 transition-colors hover:text-foreground"
+                      className="underline decoration-border underline-offset-4 hover:text-primary"
                     >
                       {ref.label} ↗
                     </a>
                     {ref.lastReviewed && (
-                      <span className="ml-2 text-muted-foreground/70">
-                        · verified {ref.lastReviewed}
+                      <span className="ml-2 text-xs text-muted-foreground">
+                        reviewed {ref.lastReviewed}
                       </span>
                     )}
                   </li>
                 ))}
               </ul>
-              <p className="mt-2 font-mono text-[0.6875rem] text-muted-foreground">
-                provider-specific facts are update-sensitive — verify against
-                current official docs
+              <p className="mt-3 text-xs leading-5 text-muted-foreground">
+                Sources offer deeper context. Provider capabilities and API
+                contracts can change; check current official docs before
+                implementing.
               </p>
-            </section>
-          )}
-
-          {/* Personal notes */}
-          <section className="mt-12">
-            <SectionLabel>notes</SectionLabel>
-            <ChapterNotes courseSlug={course.slug} chapterSlug={chapter.slug} />
-          </section>
-
-          {/* Prev / next */}
-          <nav className="mt-16 border-t pt-5">
-            <div className="flex items-center justify-between gap-4 font-mono text-xs">
-              <div className="flex items-center gap-5">
-                <MarkComplete courseSlug={course.slug} chapterSlug={chapter.slug} />
-                <BookmarkButton courseSlug={course.slug} chapterSlug={chapter.slug} />
+            </Section>
+            <Section id="notes" title="notes">
+              <ChapterNotes
+                courseSlug={course.slug}
+                chapterSlug={chapter.slug}
+              />
+            </Section>
+            <nav
+              aria-label="chapter navigation"
+              className="mt-12 border-t pt-5"
+            >
+              <p className="mb-3 text-sm leading-6 text-muted-foreground">
+                Mark complete when you can explain the mechanism and meet the
+                rubric. Logged practice returns to the roadmap for review.
+              </p>
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="flex flex-wrap items-center gap-5">
+                  <MarkComplete
+                    courseSlug={course.slug}
+                    chapterSlug={chapter.slug}
+                  />
+                  <BookmarkButton
+                    courseSlug={course.slug}
+                    chapterSlug={chapter.slug}
+                  />
+                </div>
+                <a
+                  href="#chapter-start"
+                  className="inline-flex min-h-11 items-center font-mono text-xs text-muted-foreground underline underline-offset-4"
+                >
+                  back to top ↑
+                </a>
               </div>
-              <p className="text-muted-foreground">
-                {String(chapter.order).padStart(2, "0")}/{String(course.chapters.length).padStart(2, "0")}
-              </p>
-            </div>
-            <ul className="mt-4 flex flex-col gap-3 font-mono text-xs sm:flex-row sm:justify-between">
-              <li>
-                {prev ? (
+              <ul className="mt-4 flex flex-col gap-3 text-sm sm:flex-row sm:justify-between">
+                <li>
                   <Link
-                    href={`/${course.slug}/${prev.slug}`}
-                    className="text-muted-foreground underline decoration-border underline-offset-4 transition-colors hover:text-foreground"
+                    href={
+                      prev
+                        ? "/" + course.slug + "/" + prev.slug
+                        : "/" + course.slug
+                    }
+                    className="inline-flex min-h-11 items-center text-muted-foreground underline decoration-border underline-offset-4 hover:text-primary"
                   >
-                    ← {String(prev.order).padStart(2, "0")} {prev.title.toLowerCase()}
+                    ← {prev ? prev.title : "course roadmap"}
                   </Link>
-                ) : (
+                </li>
+                <li>
                   <Link
-                    href={`/${course.slug}`}
-                    className="text-muted-foreground underline decoration-border underline-offset-4 transition-colors hover:text-foreground"
+                    href={
+                      next ? "/" + course.slug + "/" + next.slug : "/drills"
+                    }
+                    className="inline-flex min-h-11 items-center text-primary underline decoration-border underline-offset-4"
                   >
-                    ← chapter index
+                    {next ? next.title : "Continue with interview practice"} →
                   </Link>
-                )}
-              </li>
-              <li>
-                {next ? (
-                  <Link
-                    href={`/${course.slug}/${next.slug}`}
-                    className="text-muted-foreground underline decoration-border underline-offset-4 transition-colors hover:text-foreground"
-                  >
-                    {String(next.order).padStart(2, "0")} {next.title.toLowerCase()} →
-                  </Link>
-                ) : (
-                  <Link
-                    href="/"
-                    className="text-muted-foreground underline decoration-border underline-offset-4 transition-colors hover:text-foreground"
-                  >
-                    course index →
-                  </Link>
-                )}
-              </li>
-            </ul>
-          </nav>
+                </li>
+              </ul>
+            </nav>
+          </div>
         </div>
       </div>
     </main>

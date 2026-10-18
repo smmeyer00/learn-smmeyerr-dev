@@ -8,6 +8,25 @@ briefs, and build plan live in
 Already done: content engine, all 36 chapters ported and rendering, course +
 chapter routes, index page, design tokens.
 
+## Public launch polish (October 2026)
+
+- [x] Replace public planned-lab checklists with usable assignments in every chapter
+- [x] Add 36 worked examples, deliverables, constraint variations, rubrics,
+      and 72 written recall checks with sample reasoning
+- [x] Tie the 56h/73h totals to explicit suggested practice budgets
+- [x] Add orientation, a study-method page, prerequisites, and an alternating sequence
+- [x] Group roadmaps by phase and add chapter/field-manual section navigation
+- [x] Move labs before assessment; capture a prediction before exposing results
+- [x] Log chapter self-review in existing progress exports; surface weak/due practice
+- [x] Continue directly to the next unfinished chapter
+- [x] Provide a mobile menu and enlarge key touch targets
+- [x] Correct the cache-stampede prediction and add primary sources to all chapters
+- [x] Add a social preview, descriptive home metadata, and a branded 404
+
+The original `labs` strings remain internal interaction briefs rather than
+public promises or missing assignments. Physical-phone and paper checks
+remain in `docs/ROADMAP.md`.
+
 ## 1. Local progress (next up — highest user value)
 
 No backend, no accounts. Everything in versioned `localStorage`.

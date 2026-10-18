@@ -1,4 +1,5 @@
 import { courses } from "@/content";
+import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import {
   ContinueBanner,
@@ -7,6 +8,7 @@ import {
 import { CourseSummary } from "@/components/progress/course-summary";
 import { BookmarksList } from "@/components/progress/bookmarks-list";
 import { DataControls } from "@/components/progress/data-controls";
+import { PracticeQueue } from "@/components/progress/practice-queue";
 
 const chapterTitles: ChapterTitleEntry[] = courses.flatMap((course) =>
   course.chapters.map((chapter) => ({
@@ -19,19 +21,17 @@ const chapterTitles: ChapterTitleEntry[] = courses.flatMap((course) =>
 
 const entries = courses.map((course) => ({
   id: course.id,
-  area: course.slug,
   slug: course.slug,
   title: course.title,
   description: course.description,
-  lessons: course.scope,
+  hours: course.chapters.reduce((sum, chapter) => sum + chapter.hours, 0),
   total: course.chapters.length,
-  status: "live",
 }));
 
 export default function Home() {
   return (
     <main id="main" className="min-h-svh bg-background text-foreground">
-      <div className="mx-auto min-h-svh max-w-6xl px-4 sm:px-6">
+      <div className="mx-auto min-h-svh max-w-6xl px-4 pb-24 sm:px-6">
         <SiteHeader />
 
         <div className="grid gap-12 py-10 sm:py-14 lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-20">
@@ -41,11 +41,11 @@ export default function Home() {
               courses
             </h1>
             <p className="mt-4 max-w-xs text-sm leading-6 text-muted-foreground">
-              Compact technical courses. Written as working notes, edited into
-              a path.
+              Free study paths for working software engineers. Learn a
+              mechanism, work an example, and defend a design.
             </p>
 
-            <dl className="mt-9 border-t font-mono text-[0.6875rem] leading-5">
+            <dl className="mt-9 hidden border-t font-mono text-xs leading-5 lg:block">
               <div className="grid grid-cols-2 border-b py-2.5">
                 <dt className="text-muted-foreground">format</dt>
                 <dd>self-paced</dd>
@@ -63,6 +63,47 @@ export default function Home() {
 
           <section aria-labelledby="course-index">
             <ContinueBanner chapters={chapterTitles} />
+            <PracticeQueue chapters={chapterTitles} />
+            <section aria-labelledby="start-here" className="mb-10">
+              <h2
+                id="start-here"
+                className="font-mono text-xs uppercase tracking-wider text-primary"
+              >
+                start here
+              </h2>
+              <p className="mt-3 text-base leading-7">
+                Choose systems for architecture and reliability, or LLM
+                engineering for model behavior and AI applications. Both assume
+                you can read application code, design an API, and work with data
+                stores. No ML background is required.
+              </p>
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                Each chapter includes a worked example, an assignment, and a
+                self-review rubric. Time estimates include independent practice.
+                Work in one track, or alternate them using the suggested study
+                sequence.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-sm">
+                <Link
+                  href="/system-design/01-system-design-foundations"
+                  className="inline-flex min-h-11 items-center text-primary underline underline-offset-4"
+                >
+                  Start systems foundations →
+                </Link>
+                <Link
+                  href="/llm-engineering/01-mental-model-of-modern-llms"
+                  className="inline-flex min-h-11 items-center text-primary underline underline-offset-4"
+                >
+                  Start LLM foundations →
+                </Link>
+                <Link
+                  href="/about-this-course"
+                  className="inline-flex min-h-11 items-center text-muted-foreground underline underline-offset-4 hover:text-primary"
+                >
+                  How to study + suggested sequence
+                </Link>
+              </div>
+            </section>
             <div className="flex items-baseline justify-between border-b pb-3 font-mono text-xs">
               <h2 id="course-index">course index</h2>
               <p className="text-muted-foreground">
@@ -83,10 +124,6 @@ export default function Home() {
                   <article>
                     <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[0.6875rem]">
                       <p className="text-muted-foreground">/{course.slug}</p>
-                      <span className="text-border" aria-hidden="true">
-                        {"//"}
-                      </span>
-                      <p>{course.area}</p>
                     </div>
                     <h3 className="text-xl font-medium tracking-[-0.025em] sm:text-2xl">
                       <a
@@ -102,17 +139,17 @@ export default function Home() {
                   </article>
 
                   <div className="col-start-2 mt-5 flex items-center justify-between font-mono text-[0.6875rem] sm:col-start-auto sm:mt-0 sm:flex-col sm:items-end">
-                    <p
-                      className={
-                        course.status === "writing"
-                          ? "text-primary"
-                          : "text-muted-foreground"
-                      }
-                    >
-                      [{course.status}]
+                    <p className="text-primary">[free]</p>
+                    <p className="text-muted-foreground">
+                      {course.total} chapters
                     </p>
-                    <p className="text-muted-foreground">{course.lessons}</p>
-                    <CourseSummary courseSlug={course.slug} total={course.total} />
+                    <p className="text-muted-foreground">
+                      ~{course.hours}h practice
+                    </p>
+                    <CourseSummary
+                      courseSlug={course.slug}
+                      total={course.total}
+                    />
                   </div>
                 </li>
               ))}

@@ -24,7 +24,7 @@ export function MarkComplete({
       type="button"
       onClick={() => toggleChapterComplete(key)}
       aria-pressed={complete}
-      className="cursor-pointer font-mono text-xs underline decoration-border underline-offset-4 transition-colors hover:text-primary"
+      className="min-h-11 cursor-pointer font-mono text-xs underline decoration-border underline-offset-4 transition-colors hover:text-primary"
     >
       {complete ? (
         <span>

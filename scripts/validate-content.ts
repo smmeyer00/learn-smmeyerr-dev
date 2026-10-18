@@ -5,7 +5,7 @@
  *
  * Run: pnpm validate
  */
-import { courses } from "../content/index";
+import { courses, getChapterReferences } from "../content/index";
 import { labsForChapter } from "../components/labs/registry";
 import { drillScenarios, constraintDecks } from "../content/drills";
 import { fieldManual } from "../content/field-manual";
@@ -86,10 +86,65 @@ for (const course of courses) {
       check(q.explanation.length > 0, `${where} q${qi}: empty explanation`);
     });
     check(chapter.labs.length >= 1, `${where}: no planned labs listed`);
-    for (const ref of chapter.references ?? []) {
+    const guide = chapter.studyGuide;
+    check(!!guide, `${where}: missing study guide`);
+    if (guide) {
+      check(
+        guide.minutes.length === 4 &&
+          guide.minutes.every(
+            (minutes) => Number.isInteger(minutes) && minutes > 0,
+          ),
+        `${where}: invalid practice budget blocks`,
+      );
+      check(
+        guide.minutes.reduce((sum, minutes) => sum + minutes, 0) ===
+          chapter.hours * 60,
+        `${where}: study budget does not match chapter hours`,
+      );
+      check(
+        guide.example.title.length > 0 &&
+          guide.example.scenario.length > 0 &&
+          guide.example.steps.length >= 3 &&
+          guide.example.steps.every((step) => step.trim().length > 0) &&
+          guide.example.decision.length > 0 &&
+          guide.example.limitation.length > 0,
+        `${where}: incomplete worked example`,
+      );
+      check(
+        guide.assignment.deliverable.length > 0 &&
+          guide.assignment.tasks.length >= 3 &&
+          guide.assignment.variations.length >= 2 &&
+          guide.assignment.rubric.length >= 3,
+        `${where}: incomplete assignment or rubric`,
+      );
+      check(
+        [
+          ...guide.assignment.tasks,
+          ...guide.assignment.variations,
+          ...guide.assignment.rubric,
+        ].every((text) => text.trim().length > 0),
+        `${where}: empty assignment item`,
+      );
+      check(
+        guide.recall.length >= 2 &&
+          guide.recall.every(
+            (question) =>
+              question.prompt.length > 0 && question.sampleAnswer.length > 0,
+          ),
+        `${where}: incomplete recall checks`,
+      );
+      check(guide.references.length > 0, `${where}: missing primary sources`);
+    }
+    for (const ref of guide
+      ? getChapterReferences(chapter)
+      : (chapter.references ?? [])) {
       check(
         ref.href.startsWith("https://"),
         `${where}: non-https reference ${ref.href}`,
+      );
+      check(
+        !!ref.lastReviewed && /^\d{4}-(0[1-9]|1[0-2])$/.test(ref.lastReviewed),
+        `${where}: missing or invalid reference review month`,
       );
     }
     hours += chapter.hours;
@@ -107,21 +162,49 @@ for (const course of courses) {
     }
   }
 
+  check(
+    new Set(course.phaseOrder).size === course.phaseOrder.length,
+    `${course.slug}: repeated phase`,
+  );
+  check(
+    course.chapters.every((chapter) =>
+      course.phaseOrder.includes(chapter.phase),
+    ),
+    `${course.slug}: chapter phase missing from phaseOrder`,
+  );
+  check(
+    course.phaseOrder.every((phase) =>
+      course.chapters.some((chapter) => chapter.phase === phase),
+    ),
+    `${course.slug}: empty phase`,
+  );
+
   const scopeMatch = course.scope.match(/~\s*(\d+)\s*hours?/);
   check(
     scopeMatch !== null && Number(scopeMatch[1]) === hours,
     `${course.slug}: scope "${course.scope}" disagrees with summed hours (${hours}h)`,
   );
-  console.log(`  ${course.slug}: ${course.chapters.length} chapters, ${hours}h`);
+  console.log(
+    `  ${course.slug}: ${course.chapters.length} chapters, ${hours}h`,
+  );
 }
 
 console.log("validating drills…");
-check(drillScenarios.length === 20, `expected 20 scenarios, got ${drillScenarios.length}`);
+check(
+  drillScenarios.length === 20,
+  `expected 20 scenarios, got ${drillScenarios.length}`,
+);
 const drillIds = new Set(drillScenarios.map((s) => s.id));
 check(drillIds.size === drillScenarios.length, "duplicate drill scenario ids");
-check(constraintDecks.length === 7, `expected 7 decks, got ${constraintDecks.length}`);
+check(
+  constraintDecks.length === 7,
+  `expected 7 decks, got ${constraintDecks.length}`,
+);
 for (const deck of constraintDecks) {
-  check(deck.cards.length >= 5, `deck ${deck.id}: only ${deck.cards.length} cards`);
+  check(
+    deck.cards.length >= 5,
+    `deck ${deck.id}: only ${deck.cards.length} cards`,
+  );
 }
 
 console.log("validating glossary + manual…");
@@ -130,16 +213,28 @@ const chapterKeys = new Set(
   courses.flatMap((c) => c.chapters.map((ch) => `${c.slug}/${ch.slug}`)),
 );
 for (const term of glossary) {
-  check(term.definition.length > 20, `glossary "${term.term}": definition too short`);
+  check(
+    term.definition.length > 20,
+    `glossary "${term.term}": definition too short`,
+  );
   for (const key of term.related ?? []) {
-    check(chapterKeys.has(key), `glossary "${term.term}": unknown chapter ${key}`);
+    check(
+      chapterKeys.has(key),
+      `glossary "${term.term}": unknown chapter ${key}`,
+    );
   }
 }
-check(fieldManual.length === 5, `field manual has ${fieldManual.length} sections (!== 5)`);
+check(
+  fieldManual.length === 5,
+  `field manual has ${fieldManual.length} sections (!== 5)`,
+);
 
 console.log("validating search index…");
 const index = buildSearchIndex();
-check(index.length > 100, `search index has ${index.length} entries (expected > 100)`);
+check(
+  index.length > 100,
+  `search index has ${index.length} entries (expected > 100)`,
+);
 check(
   index.every((e) => e.title.length > 0 && e.href.startsWith("/")),
   "search index has entries with empty titles or bad hrefs",

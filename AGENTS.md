@@ -41,10 +41,12 @@ Key files for common tasks:
 | Edit course prose | `content/system-design.ts`, `content/llm-engineering.ts` |
 | Chapter schema | `content/types.ts`, rules in `content/README.md` |
 | Lab teaching math | `components/labs/models.ts` (pure, unit-tested) |
-| Lab UI | `components/labs/*.tsx` + `registry.ts` (`replacesPlanned` hides superseded checklist items) |
+| Study examples/assignments | `content/study-guides/`, schema in `content/types.ts` |
+| Lab UI | `components/labs/*.tsx` + `registry.ts` (live lab mapping; source briefs stay internal) |
+| Chapter review queue | `lib/study.ts`, `components/progress/recall-practice.tsx`, `practice-queue.tsx` |
 | Progress store | `lib/progress.ts` (`ProgressStateV1`, migration, import guard) |
 | Drills/mocks | `content/drills.ts` (scenarios, seeds, redo queue) |
-| Search | `lib/search.ts` (build-time index, no deps) |
+| Search | `lib/search.ts` (build-time index), `lib/search-matching.ts` (browser matching) |
 | Pre-deploy checks | `scripts/check-links.ts`, `scripts/lighthouse.mjs` |
 | CI | `.github/workflows/ci.yml` (lint → validate → test → build → playwright) |
 
@@ -60,11 +62,16 @@ Key files for common tasks:
   confirmation. Never silently overwrite user state.
 - **Scope hours = sum of chapter hours** (56h/73h). The handoff's own
   scope lines (~46h/~39h) contradict its per-chapter estimates; the sums win.
+  Hours are practice budgets; study-guide minutes must sum to them. They
+  include assignments, variations, and repeated drills.
 - **Lab math lives in `models.ts`, tested.** MAU converts to DAU through an
   explicit share; KV width is `kvHeads × headDim` (GQA, not hidden dim);
   attention patterns are causal (future weights zeroed + renormalized).
 - **Labs code-split per lab** via `LabHost` + `next/dynamic`; verified by
   grepping build chunks, not by assumption.
+- **Search matching stays separate from index construction.** Client imports
+  go through `lib/search-matching.ts`; importing the index builder can pull
+  the expanded study-guide modules into browser chunks through side effects.
 - **Mock reps join the drill redo queue** as their own rows (`mock:*` ids).
 - **Link checking stays out of CI** (external flake); `pnpm check-links`
   runs manually pre-deploy. Same for `pnpm perf` (local numbers wobble).
@@ -73,6 +80,11 @@ Key files for common tasks:
   static hosts. DNS is owned manually by Steven.
 
 ## Gotchas that have bitten before
+
+- **Managed sandbox build ports.** Some managed runs block Turbopack's
+  PostCSS IPC port even when loopback HTTP servers work. Verify with
+  `pnpm build --webpack` and report the bundler used; keep the default build
+  script unchanged. Test servers bind explicitly to `127.0.0.1`.
 
 - **Local servers orphan.** Always run prod servers on a guaranteed-free
   port (see `scripts/lighthouse.mjs` `freePort()`); stale `next start`

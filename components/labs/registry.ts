@@ -3,8 +3,8 @@
  * "<course-slug>/<chapter-slug>".
  *
  * `replacesPlanned` lists indices into the chapter's `labs` text array that
- * the interactive lab supersedes, so shipped work is not also shown as
- * "planned". `scripts/validate-content.ts` asserts every index is in range.
+ * the interactive lab supersedes. Source briefs stay internal; public pages
+ * show live labs and usable assignments. Validation checks each source index.
  */
 export type ChapterLabs = {
   id: string;

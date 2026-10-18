@@ -10,7 +10,7 @@ import {
 } from "@/lib/progress";
 
 const buttonClass =
-  "cursor-pointer font-mono text-[0.6875rem] text-muted-foreground underline decoration-border underline-offset-4 transition-colors hover:text-foreground";
+  "min-h-11 cursor-pointer font-mono text-xs text-muted-foreground underline decoration-border underline-offset-4 transition-colors hover:text-foreground";
 
 /**
  * Export / import / reset controls for local progress.
@@ -68,7 +68,7 @@ export function DataControls() {
   }
 
   return (
-    <div className="mt-10 border-t pt-5">
+    <div id="progress-data" className="mt-10 scroll-mt-6 border-t pt-5">
       <p className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-muted-foreground">
         local data
       </p>
@@ -121,7 +121,11 @@ export function DataControls() {
         )}
       </div>
       {pendingImport !== null && (
-        <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2" role="group" aria-label="confirm import">
+        <div
+          className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2"
+          role="group"
+          aria-label="confirm import"
+        >
           <button
             type="button"
             onClick={() => runImport(pendingImport)}
@@ -142,7 +146,10 @@ export function DataControls() {
         </div>
       )}
       {message && (
-        <p role="status" className="mt-3 font-mono text-[0.6875rem] text-primary">
+        <p
+          role="status"
+          className="mt-3 font-mono text-[0.6875rem] text-primary"
+        >
           {message}
         </p>
       )}

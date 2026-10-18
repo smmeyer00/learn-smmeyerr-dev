@@ -5,17 +5,12 @@ TODO section (or just building it).
 
 ## Later
 
-- **OG/social image** — needs a designed asset (1200×630). When it exists,
-  add `app/opengraph-image.tsx` (or a static `public/og.png` + metadata) and
-  re-run `pnpm perf` for the SEO pass. Blocked on: asset from Steven.
-- **Branded 404** — `app/not-found.tsx` in the index aesthetic. Small,
-  unstarted. The default Next 404 currently serves.
 - **Scheduled link check** — `pnpm check-links` is manual/pre-deploy. If
   reference rot ever matters (it won't at this traffic), run it on a weekly
   schedule against prod instead of gating CI on external sites.
-- **Real-device pass** — responsive behavior is audited by class review +
-  desktop emulation only. Worth 30 minutes on a phone before sharing the URL
-  widely: labs, palette, mock timer, tables.
+- **Physical-phone pass** — responsive browser checks cover 320px, 375px,
+  and 768px layouts, menus, labs, palette, and mock workspace. A real touch
+  device still deserves a short pass before sharing widely.
 - **Print on paper** — print CSS exists and `<details>` expand for print, but
   nobody has held a printout. One field-manual print run before calling it done.
 

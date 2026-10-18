@@ -1,4 +1,5 @@
 import type { Course } from "./types";
+import { llmEngineeringStudyGuides } from "./study-guides/llm-engineering";
 
 export const llmEngineering: Course = {
   slug: "llm-engineering",
@@ -6,7 +7,7 @@ export const llmEngineering: Course = {
   title: "LLM engineering for software engineers",
   description:
     "First-principles AI-system fluency for strong software engineers who are not trying to become ML researchers.",
-  scope: "21 chapters · ~73 hours",
+  scope: "21 chapters · ~73 hours of practice",
   phaseOrder: [
     "Foundations",
     "Serving",
@@ -22,6 +23,7 @@ export const llmEngineering: Course = {
     {
       slug: "01-mental-model-of-modern-llms",
       order: 1,
+      studyGuide: llmEngineeringStudyGuides[1],
       title: "Mental model of modern LLMs",
       phase: "Foundations",
       hours: 2,
@@ -113,14 +115,14 @@ export const llmEngineering: Course = {
         {
           question: "Why can an LLM hallucinate?",
           options: [
-            "It always uses a broken database",
+            "Only when the tokenizer encounters an unfamiliar word",
             "Plausible continuation and factual truth are different objectives",
-            "Tokens are encrypted",
-            "GPUs cannot multiply",
+            "Only when temperature is greater than zero",
+            "Only when the context window is completely full",
           ],
           answer: 1,
           explanation:
-            "The learned next-token objective can produce fluent content without sufficient grounding.",
+            "The learned next-token objective can produce fluent content without sufficient grounding. This can happen with familiar words, short contexts, or greedy decoding; those conditions do not guarantee factual support.",
         },
       ],
       labs: [
@@ -132,6 +134,7 @@ export const llmEngineering: Course = {
     {
       slug: "02-transformer-fundamentals",
       order: 2,
+      studyGuide: llmEngineeringStudyGuides[2],
       title: "Transformer fundamentals",
       phase: "Foundations",
       hours: 3,
@@ -243,6 +246,7 @@ export const llmEngineering: Course = {
     {
       slug: "03-how-models-are-trained",
       order: 3,
+      studyGuide: llmEngineeringStudyGuides[3],
       title: "How models are trained",
       phase: "Foundations",
       hours: 3,
@@ -358,6 +362,7 @@ export const llmEngineering: Course = {
     {
       slug: "04-inference-and-serving",
       order: 4,
+      studyGuide: llmEngineeringStudyGuides[4],
       title: "Inference & serving",
       phase: "Serving",
       hours: 4,
@@ -445,24 +450,24 @@ export const llmEngineering: Course = {
           options: [
             "Only output length",
             "Admission, queueing, and prefill",
-            "Database backups",
-            "Number of users total",
+            "The average time between output tokens",
+            "Total output tokens divided by generation rate",
           ],
           answer: 1,
           explanation:
-            "The first token arrives after the request is admitted, scheduled, and its prompt is processed.",
+            "The first token arrives after admission, queueing, and prompt processing. Inter-token latency describes later output pacing; output length and generation rate primarily affect time to completion.",
         },
         {
           question: "Why is decode hard to parallelize across time?",
           options: [
             "Each next token depends on prior generated tokens",
-            "GPUs lack memory",
-            "HTTP forbids it",
-            "Tokenizers are random",
+            "All requests in a batch must finish together",
+            "Every output step must reload weights from disk",
+            "The full training dataset is scanned for each token",
           ],
           answer: 0,
           explanation:
-            "Autoregressive dependence makes output steps sequential.",
+            "Autoregressive dependence makes ordinary output steps sequential: the next step uses the generated prefix. This dependency remains even with resident weights and ample memory; batching combines different requests rather than removing that dependency.",
         },
       ],
       labs: [
@@ -474,6 +479,7 @@ export const llmEngineering: Course = {
     {
       slug: "05-prompting-as-software-engineering",
       order: 5,
+      studyGuide: llmEngineeringStudyGuides[5],
       title: "Prompting as software engineering",
       phase: "Application core",
       hours: 3,
@@ -584,6 +590,7 @@ export const llmEngineering: Course = {
     {
       slug: "06-tool-use-and-function-calling",
       order: 6,
+      studyGuide: llmEngineeringStudyGuides[6],
       title: "Tool use & function calling",
       phase: "Application core",
       hours: 3,
@@ -694,6 +701,7 @@ export const llmEngineering: Course = {
     {
       slug: "07-agents",
       order: 7,
+      studyGuide: llmEngineeringStudyGuides[7],
       title: "Agents",
       phase: "Application core",
       hours: 4,
@@ -804,6 +812,7 @@ export const llmEngineering: Course = {
     {
       slug: "08-retrieval-augmented-generation",
       order: 8,
+      studyGuide: llmEngineeringStudyGuides[8],
       title: "Retrieval-augmented generation",
       phase: "Knowledge systems",
       hours: 4,
@@ -916,6 +925,7 @@ export const llmEngineering: Course = {
     {
       slug: "09-embeddings",
       order: 9,
+      studyGuide: llmEngineeringStudyGuides[9],
       title: "Embeddings",
       phase: "Knowledge systems",
       hours: 2,
@@ -1031,6 +1041,7 @@ export const llmEngineering: Course = {
     {
       slug: "10-context-and-memory",
       order: 10,
+      studyGuide: llmEngineeringStudyGuides[10],
       title: "Context & memory",
       phase: "Knowledge systems",
       hours: 3,
@@ -1146,6 +1157,7 @@ export const llmEngineering: Course = {
     {
       slug: "11-evaluation",
       order: 11,
+      studyGuide: llmEngineeringStudyGuides[11],
       title: "Evaluation",
       phase: "Production AI",
       hours: 4,
@@ -1283,6 +1295,7 @@ export const llmEngineering: Course = {
     {
       slug: "12-reliability-and-failure-modes",
       order: 12,
+      studyGuide: llmEngineeringStudyGuides[12],
       title: "Reliability & failure modes",
       phase: "Production AI",
       hours: 3,
@@ -1398,6 +1411,7 @@ export const llmEngineering: Course = {
     {
       slug: "13-safety-and-security",
       order: 13,
+      studyGuide: llmEngineeringStudyGuides[13],
       title: "Safety & security",
       phase: "Production AI",
       hours: 4,
@@ -1508,6 +1522,7 @@ export const llmEngineering: Course = {
     {
       slug: "14-building-llm-products",
       order: 14,
+      studyGuide: llmEngineeringStudyGuides[14],
       title: "Building LLM products",
       phase: "Product systems",
       hours: 3,
@@ -1623,6 +1638,7 @@ export const llmEngineering: Course = {
     {
       slug: "15-llm-application-architectures",
       order: 15,
+      studyGuide: llmEngineeringStudyGuides[15],
       title: "LLM application architectures",
       phase: "Product systems",
       hours: 3,
@@ -1733,6 +1749,7 @@ export const llmEngineering: Course = {
     {
       slug: "16-coding-agents-and-software-engineering",
       order: 16,
+      studyGuide: llmEngineeringStudyGuides[16],
       title: "Coding agents & software engineering",
       phase: "Agent systems",
       hours: 4,
@@ -1844,6 +1861,7 @@ export const llmEngineering: Course = {
     {
       slug: "17-llm-infrastructure-at-scale",
       order: 17,
+      studyGuide: llmEngineeringStudyGuides[17],
       title: "LLM infrastructure at scale",
       phase: "Agent systems",
       hours: 4,
@@ -1960,6 +1978,7 @@ export const llmEngineering: Course = {
     {
       slug: "18-modern-llm-platform-concepts",
       order: 18,
+      studyGuide: llmEngineeringStudyGuides[18],
       title: "Modern LLM platform concepts",
       phase: "LLM platforms",
       hours: 4,
@@ -2109,6 +2128,7 @@ export const llmEngineering: Course = {
     {
       slug: "19-ai-native-engineering-judgment",
       order: 19,
+      studyGuide: llmEngineeringStudyGuides[19],
       title: "AI-native engineering judgment",
       phase: "Interview mode",
       hours: 3,
@@ -2225,6 +2245,7 @@ export const llmEngineering: Course = {
     {
       slug: "20-ai-native-design-exercises",
       order: 20,
+      studyGuide: llmEngineeringStudyGuides[20],
       title: "AI-native design exercises",
       phase: "Interview mode",
       hours: 6,
@@ -2342,6 +2363,7 @@ export const llmEngineering: Course = {
     {
       slug: "21-interview-level-llm-fluency",
       order: 21,
+      studyGuide: llmEngineeringStudyGuides[21],
       title: "Interview-level LLM fluency",
       phase: "Interview mode",
       hours: 4,
@@ -2440,13 +2462,13 @@ export const llmEngineering: Course = {
           question: "A bad RAG answer should first be localized across…",
           options: [
             "Retrieval, context assembly, generation, and citation",
-            "Only model size",
-            "Only CSS",
-            "Only DNS",
+            "The aggregate model benchmark score alone",
+            "Only the generation prompt and temperature",
+            "Only provider rate limits and retry configuration",
           ],
           answer: 0,
           explanation:
-            "Different pipeline stages create different failure modes and fixes.",
+            "Different pipeline stages create different failure modes and fixes. A model score or a single configuration change cannot establish whether relevant evidence was retrieved, retained in context, and used to support the answer.",
         },
       ],
       labs: [

@@ -40,6 +40,13 @@ async function gotoLab(page: Page, labId: string, errors: string[]) {
   await page.goto(chaptersForLab.get(labId)![0]);
   await expect(page.getByText("interactive lab").first()).toBeVisible();
   await expect(page.getByText(/pedagogical model/).first()).toBeVisible();
+  await expect(page.getByRole("slider")).toHaveCount(0);
+  await page
+    .getByLabel("Your prediction and assumption")
+    .fill(
+      "I predict the output will increase; I will compare it with the stated assumptions.",
+    );
+  await page.getByRole("button", { name: "save prediction & explore" }).click();
 }
 
 async function readout(page: Page, termText: string): Promise<string> {
@@ -47,7 +54,9 @@ async function readout(page: Page, termText: string): Promise<string> {
   return (await term.locator("xpath=ancestor::div[1]/dd").textContent()) ?? "";
 }
 
-test("scale-dial responds to DAU share and judges bottlenecks", async ({ page }) => {
+test("scale-dial responds to DAU share and judges bottlenecks", async ({
+  page,
+}) => {
   const errors: string[] = [];
   await gotoLab(page, "scale-dial", errors);
   const before = await readout(page, "peak RPS");
@@ -60,7 +69,9 @@ test("scale-dial responds to DAU share and judges bottlenecks", async ({ page })
 test("cache-stampede coalescing collapses source hits", async ({ page }) => {
   const errors: string[] = [];
   await gotoLab(page, "cache-stampede", errors);
-  await page.getByRole("button", { name: "request coalescing", exact: true }).click();
+  await page
+    .getByRole("button", { name: "request coalescing", exact: true })
+    .click();
   await expect(page.getByText("1 (coalesced)").first()).toBeVisible();
   expect(errors).toEqual([]);
 });
@@ -72,7 +83,9 @@ test("partition-lease gates split brain on quorum", async ({ page }) => {
   await expect(page.getByText(/refuses \(fenced\)/).first()).toBeVisible();
   await page.getByRole("button", { name: /fencing/ }).click();
   // Minority of 2 cannot reach W=3: stalls, does not diverge.
-  await expect(page.getByText(/cannot reach write quorum/).first()).toBeVisible();
+  await expect(
+    page.getByText(/cannot reach write quorum/).first(),
+  ).toBeVisible();
   await page.getByRole("button", { name: /one node down/ }).click();
   await page.getByRole("button", { name: /all nodes reachable/ }).click();
   expect(errors).toEqual([]);
@@ -127,7 +140,9 @@ test("kv-cache scales with sequence length", async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test("agent-loop steps healthy traces and flags oscillation", async ({ page }) => {
+test("agent-loop steps healthy traces and flags oscillation", async ({
+  page,
+}) => {
   const errors: string[] = [];
   await gotoLab(page, "agent-loop", errors);
   await page.getByRole("button", { name: /step →/ }).click();
@@ -161,7 +176,9 @@ test("eval-workbench exposes the slice regression", async ({ page }) => {
   expect(await readout(page, "variant A overall")).not.toBe(overallB);
   const agreementBefore = await readout(page, "agreement with humans");
   await setRange(page, /judge pass threshold/, 0.2);
-  expect(await readout(page, "agreement with humans")).not.toBe(agreementBefore);
+  expect(await readout(page, "agreement with humans")).not.toBe(
+    agreementBefore,
+  );
   await expect(page.getByText(/GATE:/).first()).toBeVisible();
   expect(errors).toEqual([]);
 });

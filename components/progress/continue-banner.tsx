@@ -2,49 +2,49 @@
 
 import Link from "next/link";
 import { isChapterComplete, useProgress } from "@/lib/progress";
+import { nextIncompleteChapter, type StudyChapter } from "@/lib/study";
 
-export type ChapterTitleEntry = {
-  key: string;
-  courseSlug: string;
-  courseTitle: string;
-  chapterTitle: string;
-};
+export type ChapterTitleEntry = StudyChapter;
 
-/**
- * "Continue where you left off" banner for the course index.
- * Titles arrive as serialized props so the client bundle never imports
- * the full course content. Hidden until a visit is recorded.
- */
 export function ContinueBanner({
   chapters,
 }: {
   chapters: ChapterTitleEntry[];
 }) {
   const progress = useProgress();
-  const { lastVisited } = progress;
-  const entry = chapters.find((c) => c.key === lastVisited);
+  const entry = chapters.find(
+    (chapter) => chapter.key === progress.lastVisited,
+  );
   if (!entry) return null;
-
   const done = isChapterComplete(progress, entry.key);
-  const [courseSlug, ...rest] = entry.key.split("/");
-  const chapterSlug = rest.join("/");
-  const href = done ? `/${courseSlug}` : `/${courseSlug}/${chapterSlug}`;
+  const next = done
+    ? nextIncompleteChapter(chapters, progress.completedChapters, entry.key)
+    : undefined;
+  const target = next ?? entry;
+  const allDone = done && !next;
 
   return (
-    <div className="mb-10 rounded-md border border-primary/30 bg-primary/5 p-5">
-      <p className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-primary">
-        {done ? "last completed" : "continue"}
+    <section
+      aria-label="continue studying"
+      className="mb-8 border-l-2 border-primary/60 pl-4"
+    >
+      <p className="font-mono text-xs uppercase tracking-wider text-primary">
+        {allDone ? "course chapters complete" : done ? "up next" : "continue"}
       </p>
-      <p className="mt-2 text-sm leading-6 text-foreground">
-        {entry.courseTitle} — {entry.chapterTitle}
-        {done && <span className="text-muted-foreground"> ✓</span>}
+      <p className="mt-2 text-base leading-7">
+        {target.courseTitle} —{" "}
+        {allDone ? "return to practice" : target.chapterTitle}
       </p>
       <Link
-        href={href}
-        className="mt-2 inline-block font-mono text-xs text-primary underline decoration-border underline-offset-4 transition-colors hover:text-foreground"
+        href={allDone ? "/drills" : "/" + target.key}
+        className="mt-1 inline-flex min-h-11 items-center text-sm text-primary underline underline-offset-4"
       >
-        {done ? "→ back to the course" : "→ pick up where you left off"}
+        {allDone
+          ? "→ choose an interview drill"
+          : done
+            ? "→ start the next chapter"
+            : "→ pick up where you left off"}
       </Link>
-    </div>
+    </section>
   );
 }

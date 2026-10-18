@@ -12,12 +12,14 @@ import { spawn } from "node:child_process";
 import { createServer } from "node:net";
 import { existsSync, globSync } from "node:fs";
 
+const LOOPBACK = "127.0.0.1";
+
 /** A port nothing else holds: stale `next start` orphans must never poison a run. */
 async function freePort() {
   return new Promise((resolve, reject) => {
     const probe = createServer();
     probe.once("error", reject);
-    probe.listen(0, () => {
+    probe.listen(0, LOOPBACK, () => {
       const address = probe.address();
       const port = typeof address === "object" && address ? address.port : 0;
       probe.close(() => resolve(port));
@@ -26,13 +28,24 @@ async function freePort() {
 }
 
 const PORT = await freePort();
-const BASE = `http://localhost:${PORT}`;
+const BASE = `http://${LOOPBACK}:${PORT}`;
 const TARGETS = [
   { url: `${BASE}/`, label: "index" },
-  { url: `${BASE}/system-design/01-system-design-foundations`, label: "chapter" },
-  { url: `${BASE}/llm-engineering/04-inference-and-serving`, label: "lab page" },
+  {
+    url: `${BASE}/system-design/01-system-design-foundations`,
+    label: "chapter",
+  },
+  {
+    url: `${BASE}/llm-engineering/04-inference-and-serving`,
+    label: "lab page",
+  },
 ];
-const FLOORS = { performance: 85, accessibility: 95, "best-practices": 90, seo: 90 };
+const FLOORS = {
+  performance: 85,
+  accessibility: 95,
+  "best-practices": 90,
+  seo: 90,
+};
 
 function findChrome() {
   if (process.env.CHROME_PATH && existsSync(process.env.CHROME_PATH)) {
@@ -42,7 +55,9 @@ function findChrome() {
   const hits = globSync(
     `${home}/Library/Caches/ms-playwright/chromium_headless_shell-*/**/chrome-headless-shell`,
   ).concat(
-    globSync(`${home}/.cache/ms-playwright/chromium_headless_shell-*/**/chrome-headless-shell`),
+    globSync(
+      `${home}/.cache/ms-playwright/chromium_headless_shell-*/**/chrome-headless-shell`,
+    ),
   );
   if (hits.length === 0) {
     throw new Error(
@@ -61,15 +76,20 @@ async function waitForServer(url, timeoutMs = 60_000) {
     } catch {
       /* not up yet */
     }
-    if (Date.now() - start > timeoutMs) throw new Error(`server never came up: ${url}`);
+    if (Date.now() - start > timeoutMs)
+      throw new Error(`server never came up: ${url}`);
     await new Promise((r) => setTimeout(r, 500));
   }
 }
 
-const server = spawn("pnpm", ["exec", "next", "start", "-p", String(PORT)], {
-  stdio: "ignore",
-  detached: false,
-});
+const server = spawn(
+  "pnpm",
+  ["exec", "next", "start", "--hostname", LOOPBACK, "-p", String(PORT)],
+  {
+    stdio: "ignore",
+    detached: false,
+  },
+);
 process.on("exit", () => {
   try {
     server.kill();
@@ -82,8 +102,7 @@ let failed = false;
 try {
   await waitForServer(BASE);
   const chromeLauncher = await import("chrome-launcher");
-  const launchChrome =
-    chromeLauncher.launch ?? chromeLauncher.default?.launch;
+  const launchChrome = chromeLauncher.launch ?? chromeLauncher.default?.launch;
   if (!launchChrome) throw new Error("chrome-launcher has no launch export");
   const lh = await import("lighthouse");
   const lighthouse = lh.default ?? lh;
@@ -112,7 +131,9 @@ try {
           for (const ref of cats[k].auditRefs) {
             const a = result.lhr.audits[ref.id];
             if (a.score !== null && a.score < 1) {
-              console.log(`    failing: ${ref.id} (${Math.round(a.score * 100)})`);
+              console.log(
+                `    failing: ${ref.id} (${Math.round(a.score * 100)})`,
+              );
             }
           }
         }

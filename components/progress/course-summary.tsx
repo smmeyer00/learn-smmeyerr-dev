@@ -6,13 +6,15 @@ import { countCompleted, useProgress } from "@/lib/progress";
 export function CourseSummary({
   courseSlug,
   total,
+  showEmpty = false,
 }: {
   courseSlug: string;
   total: number;
+  showEmpty?: boolean;
 }) {
   const progress = useProgress();
   const done = countCompleted(progress, courseSlug);
-  if (done === 0) return null;
+  if (done === 0 && !showEmpty) return null;
   const pct = Math.round((done / total) * 100);
   return (
     <p className="text-primary">

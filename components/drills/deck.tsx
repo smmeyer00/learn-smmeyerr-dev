@@ -25,7 +25,9 @@ const stateLabel: Record<QueueState, string> = {
 function FluencyTimer() {
   const [index, setIndex] = useState(0);
   const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
-  const [timer, setTimer] = useState<ReturnType<typeof setInterval> | null>(null);
+  const [timer, setTimer] = useState<ReturnType<typeof setInterval> | null>(
+    null,
+  );
 
   const current = fluencyPrompts[index];
 
@@ -59,14 +61,28 @@ function FluencyTimer() {
         oral fluency · {current.minutes} min
       </p>
       <p className="mt-2 text-sm leading-6 text-foreground">{current.prompt}</p>
-      <p className="mt-3 font-mono text-2xl tabular-nums text-primary" role="timer" aria-live="off">
-        {mm === null ? `${current.minutes}:00` : `${mm}:${String(ss).padStart(2, "0")}`}
+      <p
+        className="mt-3 font-mono text-2xl tabular-nums text-primary"
+        role="timer"
+        aria-live="off"
+      >
+        {mm === null
+          ? `${current.minutes}:00`
+          : `${mm}:${String(ss).padStart(2, "0")}`}
       </p>
       <div className="mt-3 flex flex-wrap gap-3">
-        <button type="button" onClick={start} className="cursor-pointer rounded border border-border px-3 py-1.5 font-mono text-xs text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground">
+        <button
+          type="button"
+          onClick={start}
+          className="cursor-pointer rounded border border-border px-3 py-1.5 font-mono text-xs text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
+        >
           [ start ]
         </button>
-        <button type="button" onClick={stop} className="cursor-pointer rounded border border-border px-3 py-1.5 font-mono text-xs text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground">
+        <button
+          type="button"
+          onClick={stop}
+          className="cursor-pointer rounded border border-border px-3 py-1.5 font-mono text-xs text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
+        >
           [ stop ]
         </button>
         <button
@@ -140,7 +156,10 @@ export function DrillDeck() {
               if (Number.isInteger(seed)) roll(seed);
             }}
           >
-            <label htmlFor="drill-seed" className="font-mono text-[0.6875rem] text-muted-foreground">
+            <label
+              htmlFor="drill-seed"
+              className="font-mono text-[0.6875rem] text-muted-foreground"
+            >
               seed
             </label>
             <input
@@ -155,7 +174,10 @@ export function DrillDeck() {
         </div>
 
         {draw ? (
-          <div className="mt-5 rounded-md border border-border p-5" aria-live="polite">
+          <div
+            className="mt-5 rounded-md border border-border p-5"
+            aria-live="polite"
+          >
             <p className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-primary">
               {draw.scenario.track} · seed {draw.seed}
             </p>
@@ -167,18 +189,28 @@ export function DrillDeck() {
             </p>
             <dl className="mt-4 border-t font-mono text-xs leading-6">
               {draw.cards.map((c) => (
-                <div key={c.deck} className="grid gap-x-6 border-b py-2 sm:grid-cols-[8rem_minmax(0,1fr)]">
+                <div
+                  key={c.deck}
+                  className="grid gap-x-6 border-b py-2 sm:grid-cols-[8rem_minmax(0,1fr)]"
+                >
                   <dt className="text-muted-foreground">{c.deck}</dt>
                   <dd className="text-foreground/90">{c.card}</dd>
                 </div>
               ))}
             </dl>
             <p className="mt-3 font-mono text-[0.6875rem] text-muted-foreground">
-              run the 50-minute arc; at minute 20 the failure card is already on the table.
+              run the 50-minute arc; at minute 20 the failure card is already on
+              the table.
             </p>
             {!logged ? (
-              <div className="mt-4 flex flex-wrap items-center gap-2" role="group" aria-label="log attempt with self score">
-                <span className="font-mono text-[0.6875rem] text-muted-foreground">log rep:</span>
+              <div
+                className="mt-4 flex flex-wrap items-center gap-2"
+                role="group"
+                aria-label="log attempt with self score"
+              >
+                <span className="font-mono text-[0.6875rem] text-muted-foreground">
+                  log rep:
+                </span>
                 {[1, 2, 3, 4].map((s) => (
                   <button
                     key={s}
@@ -205,26 +237,32 @@ export function DrillDeck() {
           </div>
         ) : (
           <p className="mt-5 font-mono text-xs leading-6 text-muted-foreground">
-            Draw to get one scenario plus seven constraint cards. Same seed replays the exact draw — redo it after 48
-            hours without reviewing the old diagram.
+            Draw to get one scenario plus seven constraint cards. Same seed
+            replays the exact draw — redo it after 48 hours without reviewing
+            the old diagram.
           </p>
         )}
       </section>
 
-      <section aria-label="redo queue">
+      <section id="redo-queue" aria-label="redo queue" className="scroll-mt-6">
         <h2 className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-primary">
           48-hour redo queue
         </h2>
         <ol className="mt-3 border-t">
           {queue.map((row) => (
-            <li key={row.id} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b py-2.5">
+            <li
+              key={row.id}
+              className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b py-2.5"
+            >
               <p className="text-sm text-foreground">
                 {row.kind === "scenario" ? (
                   <button
                     type="button"
                     onClick={() => {
                       const fresh = drawScenario(randomSeed());
-                      const scenario = drillScenarios.find((s) => s.id === row.id);
+                      const scenario = drillScenarios.find(
+                        (s) => s.id === row.id,
+                      );
                       setDraw(scenario ? { ...fresh, scenario } : fresh);
                       setLogged(false);
                     }}
@@ -233,7 +271,10 @@ export function DrillDeck() {
                     {row.title}
                   </button>
                 ) : (
-                  <Link href="/mock" className="underline decoration-border underline-offset-4 transition-colors hover:text-primary">
+                  <Link
+                    href="/mock"
+                    className="underline decoration-border underline-offset-4 transition-colors hover:text-primary"
+                  >
                     {row.title}
                   </Link>
                 )}
@@ -242,8 +283,14 @@ export function DrillDeck() {
                   {row.lastScore !== undefined && ` · last ${row.lastScore}/4`}
                 </span>
               </p>
-              <p className={`font-mono text-[0.6875rem] ${row.state === "weak" ? "text-destructive" : row.state === "fresh" ? "text-muted-foreground" : "text-primary"}`}>
-                {row.state === "weak" ? "✗ " : row.state === "fresh" ? "✓ " : "→ "}
+              <p
+                className={`font-mono text-[0.6875rem] ${row.state === "weak" ? "text-destructive" : row.state === "fresh" ? "text-muted-foreground" : "text-primary"}`}
+              >
+                {row.state === "weak"
+                  ? "✗ "
+                  : row.state === "fresh"
+                    ? "✓ "
+                    : "→ "}
                 {stateLabel[row.state]}
               </p>
             </li>
@@ -276,7 +323,8 @@ export function DrillDeck() {
           oral fluency circuit
         </h2>
         <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
-          Out loud, timed, no pauses. Seniority is audible: short sentences, named tradeoffs, explicit risks.
+          Out loud, timed, no pauses. Seniority is audible: short sentences,
+          named tradeoffs, explicit risks.
         </p>
         <div className="mt-4">
           <FluencyTimer />

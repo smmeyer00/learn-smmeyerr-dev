@@ -10,6 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/mock`, lastModified: new Date() },
     { url: `${BASE}/field-manual`, lastModified: new Date() },
     { url: `${BASE}/glossary`, lastModified: new Date() },
+    { url: `${BASE}/about-this-course`, lastModified: new Date() },
   ];
 
   for (const course of courses) {

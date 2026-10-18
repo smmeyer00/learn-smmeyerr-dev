@@ -31,8 +31,33 @@ export type QuizQuestion = {
 export type Reference = {
   label: string;
   href: string;
-  /** YYYY-MM: when the link was verified; provider facts are update-sensitive */
+  /** YYYY-MM: when the linked resource was reviewed; provider facts can change. */
   lastReviewed?: string;
+};
+
+export type RecallQuestion = {
+  prompt: string;
+  sampleAnswer: string;
+};
+
+export type ChapterStudyGuide = {
+  /** Suggested minutes: read/example, assignment/variations, drill/repeats, recall/review. */
+  minutes: [number, number, number, number];
+  example: {
+    title: string;
+    scenario: string;
+    steps: string[];
+    decision: string;
+    limitation: string;
+  };
+  assignment: {
+    deliverable: string;
+    tasks: string[];
+    variations: string[];
+    rubric: string[];
+  };
+  recall: RecallQuestion[];
+  references: Reference[];
 };
 
 export type Chapter = {
@@ -55,6 +80,7 @@ export type Chapter = {
     flow: FlowStep[];
   };
   lessons: Lesson[];
+  studyGuide: ChapterStudyGuide;
   seniorSignal: string;
   pitfalls: string[];
   drill: {
