@@ -81,6 +81,10 @@ Key files for common tasks:
 
 ## Gotchas that have bitten before
 
+- **PNG-backed ICO entries must be RGBA.** When exporting `app/favicon.ico`,
+  use `ensureAlpha()` before encoding each PNG. RGB PNG entries can pass a
+  webpack build but fail Turbopack's ICO decoder; verify the dev homepage too.
+
 - **Managed sandbox build ports.** Some managed runs block Turbopack's
   PostCSS IPC port even when loopback HTTP servers work. Verify with
   `pnpm build --webpack` and report the bundler used; keep the default build
