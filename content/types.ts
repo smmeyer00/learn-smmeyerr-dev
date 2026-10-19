@@ -40,7 +40,25 @@ export type RecallQuestion = {
   sampleAnswer: string;
 };
 
-export type ChapterStudyGuide = {
+export type ChapterPractice = {
+  sampleSolution: {
+    assumptions: string;
+    /** A concrete reference artifact: table, protocol, diagram, or annotated draft. */
+    artifact: string;
+    explanation: string;
+    checks: string[];
+    pitfall: string;
+  };
+  cumulativePractice: {
+    /** Earlier chapter orders, validated within this track. */
+    revisit: number[];
+    deliverable: string;
+    prompt: string;
+    sampleAnswer: string;
+  };
+};
+
+export type ChapterStudyGuide = ChapterPractice & {
   /** Suggested minutes: read/example, assignment/variations, drill/repeats, recall/review. */
   minutes: [number, number, number, number];
   example: {
@@ -101,6 +119,7 @@ export type Course = {
   /** short line used on the index page */
   description: string;
   scope: string;
+  practiceProject: { title: string; brief: string };
   phaseOrder: string[];
   chapters: Chapter[];
 };

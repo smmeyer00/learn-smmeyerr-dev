@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { DrillDeck } from "@/components/drills/deck";
+import { GuidedExerciseIndex } from "@/components/drills/guided-index";
+import { guidedExerciseSummaries } from "@/content/guided-exercises";
 
 export const metadata: Metadata = {
-  title: "Drill deck | Learn",
+  title: "Guided practice | Learn",
   description:
-    "20 interview scenarios with randomizable constraint cards, reproducible seeds, and a 48-hour redo queue.",
+    "Two guided exercises with clear briefs, worksheets, worked reference answers, evidence-based self-review, and targeted revision.",
   alternates: { canonical: "/drills" },
 };
 
@@ -19,23 +21,35 @@ export default function DrillsPage() {
         <div className="mx-auto max-w-3xl py-10 sm:py-14">
           <p className="font-mono text-xs text-primary">practice / drills</p>
           <h1 className="mt-5 text-3xl font-medium tracking-[-0.035em] sm:text-4xl">
-            drill deck
+            guided practice
           </h1>
-          <p className="mt-4 max-w-xl text-sm leading-6 text-muted-foreground">
-            Twenty scenarios across system design and AI-native design. Each
-            draw adds seven constraint cards — scale, traffic, SLO, failure,
-            security, residency, cost. Seeds replay exact draws. Ready for
-            the clock?{" "}
-            <Link
-              href="/mock"
-              className="underline decoration-border underline-offset-4 transition-colors hover:text-foreground"
-            >
-              Run the 50-minute mock →
-            </Link>
+          <p className="mt-4 text-base leading-7">
+            Apply one course concept at a time. Choose your track, make an
+            attempt, compare the worked answer, and revise the weakest part.
+            Start with either exercise after its preparation chapters.
+            Use it for part of that chapter&apos;s practice budget.
+          </p>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            Each case supplies its facts and expected artifact. Calculation
+            checks are automatic; explicit rubrics help you assess the
+            reasoning. Your first attempt and revision stay together in local
+            progress, so you can resume or repeat the same case later.
           </p>
           <div className="mt-8">
-            <DrillDeck />
+            <GuidedExerciseIndex exercises={guidedExerciseSummaries} />
           </div>
+          <details id="independent-practice" className="mt-12 border-y py-4">
+            <summary className="min-h-11 cursor-pointer text-sm text-muted-foreground">
+              Independent interview practice · scenario deck, redo queue, and oral fluency
+            </summary>
+            <p className="mt-4 text-sm leading-6 text-muted-foreground">
+              After guided practice, use the original random deck for open-ended
+              design rehearsal. These prompts require independent self-review.
+              For a timed full design, use the{" "}
+              <Link href="/mock" className="text-primary underline underline-offset-4">50-minute mock workspace →</Link>
+            </p>
+            <div className="mt-6"><DrillDeck /></div>
+          </details>
         </div>
       </div>
     </main>

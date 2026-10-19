@@ -10,12 +10,22 @@ chapter routes, index page, design tokens.
 
 ## Public launch polish (October 2026)
 
+- [x] Rebuild `/drills` around one complete guided pilot per course, with
+      worksheets, worked comparisons, anchored self-review, revision,
+      local draft/history persistence, and targeted review scheduling
+
+Additional guided cases wait for Steven's review of these two pilots.
+
+- [x] Expand teaching in all 108 lesson sections across both tracks
+- [x] Add 36 reference assignment artifacts with assumptions and explicit checks
+- [x] Add cumulative Relay/Harbor projects with backward recall and final reviews
+
 - [x] Replace public planned-lab checklists with usable assignments in every chapter
 - [x] Add 36 worked examples, deliverables, constraint variations, rubrics,
       and 72 written recall checks with sample reasoning
 - [x] Tie the 56h/73h totals to explicit suggested practice budgets
 - [x] Add orientation, a study-method page, prerequisites, and an alternating sequence
-- [x] Group roadmaps by phase and add chapter/field-manual section navigation
+- [x] Group roadmaps by phase and add chapter/manual section navigation
 - [x] Move labs before assessment; capture a prediction before exposing results
 - [x] Log chapter self-review in existing progress exports; surface weak/due practice
 - [x] Continue directly to the next unfinished chapter
@@ -88,9 +98,9 @@ alone; respect `prefers-reduced-motion`.
       then unattempted, then 48h+ stale)
 - [x] Oral fluency timers (llm ch. 21 circuit) (fluency circuit on `/drills`)
 
-## 4. Field manual
+## 4. Manual
 
-- [x] `/field-manual` page: scale formulas, availability budgets, AI-system
+- [x] `/manual` page: scale formulas, availability budgets, AI-system
       metrics, 50-minute checklist, FACT frame (content ported verbatim from
       handoff §7; shared `SiteHeader` links it from every page)
 - [x] Print/PDF-friendly layout (also print-clean chapter pages) (global

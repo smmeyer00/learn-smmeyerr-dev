@@ -10,7 +10,8 @@
 import { courses } from "@/content";
 import { glossary, slugifyTerm } from "@/content/glossary";
 import { drillScenarios } from "@/content/drills";
-import { fieldManual } from "@/content/field-manual";
+import { manual } from "@/content/manual";
+import { guidedExerciseSummaries } from "@/content/guided-exercises";
 
 import type { SearchEntry } from "./search-matching";
 export { searchEntries } from "./search-matching";
@@ -35,6 +36,8 @@ export function buildSearchIndex(extra: SearchEntry[] = []): SearchEntry[] {
           ...chapter.lessons.map((l) => l.title),
           chapter.studyGuide.example.title,
           chapter.studyGuide.assignment.deliverable,
+          course.practiceProject.title,
+          chapter.studyGuide.cumulativePractice.deliverable,
           ...chapter.studyGuide.recall.map((question) => question.prompt),
           chapter.drill.prompt,
           ...chapter.drill.constraints,
@@ -60,27 +63,37 @@ export function buildSearchIndex(extra: SearchEntry[] = []): SearchEntry[] {
       kind: "drill",
       title: scenario.title,
       detail: `${scenario.track} drill · ${scenario.focus}`,
-      href: "/drills",
+      href: "/drills#independent-practice",
       text: `${scenario.title}\n${scenario.track}\n${scenario.focus}`.toLowerCase(),
     });
   }
 
-  for (const section of fieldManual) {
+  for (const exercise of guidedExerciseSummaries) {
+    entries.push({
+      kind: "drill",
+      title: exercise.title,
+      detail: exercise.track + " · guided worksheet · ~" + exercise.minutes + " min",
+      href: "/drills/" + exercise.id,
+      text: [exercise.title, exercise.outcome, exercise.track, "guided practice worksheet reference answer rubric revision"].join("\n").toLowerCase(),
+    });
+  }
+
+  for (const section of manual) {
     entries.push({
       kind: "manual",
-      title: `field manual: ${section.title}`,
+      title: `manual: ${section.title}`,
       detail: section.intro,
-      href: `/field-manual#${section.id}`,
+      href: `/manual#${section.id}`,
       text: `${section.title}\n${section.intro}\n${section.rows.map((r) => `${r.label} ${r.value}`).join("\n")}`.toLowerCase(),
     });
   }
 
   entries.push({
-    kind: "guide",
-    title: "How to study these courses",
+    kind: "about",
+    title: "About these courses: study sequence and practice",
     detail:
       "Prerequisites, study sequence, practice budgets, and local progress",
-    href: "/about-this-course",
+    href: "/about",
     text: "start here prerequisites study guide recommended sequence practice budget hours export import progress updates sources",
   });
   return [...entries, ...extra];

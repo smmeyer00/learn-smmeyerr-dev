@@ -12,7 +12,7 @@ TODO section (or just building it).
   and 768px layouts, menus, labs, palette, and mock workspace. A real touch
   device still deserves a short pass before sharing widely.
 - **Print on paper** — print CSS exists and `<details>` expand for print, but
-  nobody has held a printout. One field-manual print run before calling it done.
+  nobody has held a printout. One manual print run before calling it done.
 
 ## Ongoing (process, not code)
 

@@ -1,25 +1,25 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
-import { fieldManual } from "@/content/field-manual";
+import { manual } from "@/content/manual";
 
 export const metadata: Metadata = {
-  title: "Field manual | Learn",
+  title: "Manual | Learn",
   description:
     "Scale formulas, availability budgets, AI-system metrics, the 50-minute checklist, and the FACT frame.",
-  alternates: { canonical: "/field-manual" },
+  alternates: { canonical: "/manual" },
 };
 
-export default function FieldManualPage() {
+export default function ManualPage() {
   return (
     <main id="main" className="min-h-svh bg-background text-foreground">
       <div className="mx-auto min-h-svh max-w-6xl px-4 pb-24 sm:px-6">
-        <SiteHeader trail={[{ label: "field-manual" }]} />
+        <SiteHeader trail={[{ label: "manual" }]} />
 
         <div className="mx-auto max-w-3xl py-10 sm:py-14">
           <p className="font-mono text-xs text-primary">reference</p>
           <h1 className="mt-5 text-3xl font-medium tracking-[-0.035em] sm:text-4xl">
-            field manual
+            manual
           </h1>
           <p className="mt-4 max-w-xl text-sm leading-6 text-muted-foreground">
             Everything worth memorizing, on one page. Print it before the
@@ -28,11 +28,11 @@ export default function FieldManualPage() {
           </p>
 
           <nav
-            aria-label="field manual sections"
+            aria-label="manual sections"
             className="mt-6 border-y py-3"
           >
             <ul className="flex flex-wrap gap-x-6">
-              {fieldManual.map((section) => (
+              {manual.map((section) => (
                 <li key={section.id}>
                   <a
                     href={"#" + section.id}
@@ -45,7 +45,7 @@ export default function FieldManualPage() {
             </ul>
           </nav>
 
-          {fieldManual.map((section) => (
+          {manual.map((section) => (
             <section
               key={section.id}
               id={section.id}

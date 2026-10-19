@@ -1,3 +1,4 @@
+import { llmEngineeringPractice } from "../practice/llm-engineering";
 import type { ChapterStudyGuide } from "../types";
 import { sources as s } from "../references";
 
@@ -5,6 +6,7 @@ import { sources as s } from "../references";
 // a relationship; they make no claims about a particular commercial model.
 export const llmEngineeringStudyGuides = {
   1: {
+    ...llmEngineeringPractice[1],
     minutes: [20, 60, 25, 15],
     example: {
       title: "A confident completion with no supporting evidence",
@@ -56,6 +58,7 @@ export const llmEngineeringStudyGuides = {
     references: [s.generation],
   },
   2: {
+    ...llmEngineeringPractice[2],
     minutes: [25, 100, 35, 20],
     example: {
       title: "Compute one causal attention mixture",
@@ -107,6 +110,7 @@ export const llmEngineeringStudyGuides = {
     references: [s.transformer, s.serving],
   },
   3: {
+    ...llmEngineeringPractice[3],
     minutes: [25, 100, 35, 20],
     example: {
       title: "An offline gain disappears on real support tickets",
@@ -158,6 +162,7 @@ export const llmEngineeringStudyGuides = {
     references: [s.training, s.evals],
   },
   4: {
+    ...llmEngineeringPractice[4],
     minutes: [30, 140, 50, 20],
     example: {
       title: "Calculate the KV memory of one sequence",
@@ -209,6 +214,7 @@ export const llmEngineeringStudyGuides = {
     references: [s.serving],
   },
   5: {
+    ...llmEngineeringPractice[5],
     minutes: [25, 100, 35, 20],
     example: {
       title: "Specify a support triage result that code can enforce",
@@ -260,6 +266,7 @@ export const llmEngineeringStudyGuides = {
     references: [s.agents, s.injection, s.evals],
   },
   6: {
+    ...llmEngineeringPractice[6],
     minutes: [25, 100, 35, 20],
     example: {
       title: "A duplicated refund tool call",
@@ -310,6 +317,7 @@ export const llmEngineeringStudyGuides = {
     references: [s.agents, s.retries, s.security],
   },
   7: {
+    ...llmEngineeringPractice[7],
     minutes: [30, 140, 50, 20],
     example: {
       title: "Choose a workflow before choosing an agent loop",
@@ -360,6 +368,7 @@ export const llmEngineeringStudyGuides = {
     references: [s.agents, s.context],
   },
   8: {
+    ...llmEngineeringPractice[8],
     minutes: [30, 140, 50, 20],
     example: {
       title: "Separate retrieval failure from unsupported generation",
@@ -410,6 +419,7 @@ export const llmEngineeringStudyGuides = {
     references: [s.rag, s.embeddings, s.injection],
   },
   9: {
+    ...llmEngineeringPractice[9],
     minutes: [20, 60, 25, 15],
     example: {
       title: "Compare a semantic match with an exact identifier",
@@ -461,6 +471,7 @@ export const llmEngineeringStudyGuides = {
     references: [s.embeddings],
   },
   10: {
+    ...llmEngineeringPractice[10],
     minutes: [25, 100, 35, 20],
     example: {
       title: "A summary preserves a decision but loses its reason",
@@ -511,6 +522,7 @@ export const llmEngineeringStudyGuides = {
     references: [s.context],
   },
   11: {
+    ...llmEngineeringPractice[11],
     minutes: [30, 140, 50, 20],
     example: {
       title: "An aggregate win hides a critical-slice regression",
@@ -561,6 +573,7 @@ export const llmEngineeringStudyGuides = {
     references: [s.evals],
   },
   12: {
+    ...llmEngineeringPractice[12],
     minutes: [25, 100, 35, 20],
     example: {
       title: "A retry repairs JSON but repeats an external action",
@@ -611,6 +624,7 @@ export const llmEngineeringStudyGuides = {
     references: [s.retries, s.agents, s.evals],
   },
   13: {
+    ...llmEngineeringPractice[13],
     minutes: [30, 140, 50, 20],
     example: {
       title: "A retrieved document asks the assistant to send a secret",
@@ -661,6 +675,7 @@ export const llmEngineeringStudyGuides = {
     references: [s.injection, s.security, s.agents],
   },
   14: {
+    ...llmEngineeringPractice[14],
     minutes: [25, 100, 35, 20],
     example: {
       title: "Compare cost per useful result",
@@ -711,6 +726,7 @@ export const llmEngineeringStudyGuides = {
     references: [s.evals, s.agents],
   },
   15: {
+    ...llmEngineeringPractice[15],
     minutes: [25, 100, 35, 20],
     example: {
       title: "Move a slow review into a durable job",
@@ -762,6 +778,7 @@ export const llmEngineeringStudyGuides = {
     references: [s.agents, s.kafka, s.retries],
   },
   16: {
+    ...llmEngineeringPractice[16],
     minutes: [30, 140, 50, 20],
     example: {
       title: "A coding agent makes tests green by deleting the assertion",
@@ -812,6 +829,7 @@ export const llmEngineeringStudyGuides = {
     references: [s.agents, s.context, s.evals],
   },
   17: {
+    ...llmEngineeringPractice[17],
     minutes: [30, 140, 50, 20],
     example: {
       title: "A noisy tenant changes the token mix",
@@ -862,6 +880,7 @@ export const llmEngineeringStudyGuides = {
     references: [s.serving, s.overload, s.loadBalancing],
   },
   18: {
+    ...llmEngineeringPractice[18],
     minutes: [30, 140, 50, 20],
     example: {
       title: "A provider switch breaks a valid-looking tool response",
@@ -912,6 +931,7 @@ export const llmEngineeringStudyGuides = {
     references: [s.agents, s.evals],
   },
   19: {
+    ...llmEngineeringPractice[19],
     minutes: [25, 100, 35, 20],
     example: {
       title: "Choose the intervention that addresses the observed failure",
@@ -962,6 +982,7 @@ export const llmEngineeringStudyGuides = {
     references: [s.evals, s.rag, s.agents],
   },
   20: {
+    ...llmEngineeringPractice[20],
     minutes: [30, 210, 100, 20],
     example: {
       title: "Defend the critical path of a tool executor",
@@ -1013,6 +1034,7 @@ export const llmEngineeringStudyGuides = {
     references: [s.agents, s.serving, s.evals, s.security],
   },
   21: {
+    ...llmEngineeringPractice[21],
     minutes: [25, 135, 60, 20],
     example: {
       title: "Explain an unfamiliar detail without inventing it",

@@ -1,3 +1,4 @@
+import { systemDesignPractice } from "../practice/system-design";
 import type { ChapterStudyGuide } from "../types";
 import { sources as s } from "../references";
 
@@ -5,6 +6,7 @@ import { sources as s } from "../references";
 // these examples are assumptions for the exercise, not measured benchmarks.
 export const systemDesignStudyGuides = {
   1: {
+    ...systemDesignPractice[1],
     minutes: [25, 100, 35, 20],
     example: {
       title: "Size a paste service before choosing its storage",
@@ -56,6 +58,7 @@ export const systemDesignStudyGuides = {
     references: [s.slos, s.storage],
   },
   2: {
+    ...systemDesignPractice[2],
     minutes: [25, 100, 35, 20],
     example: {
       title: "Fit retries inside a request deadline",
@@ -107,6 +110,7 @@ export const systemDesignStudyGuides = {
     references: [s.retries, s.loadBalancing],
   },
   3: {
+    ...systemDesignPractice[3],
     minutes: [30, 140, 50, 20],
     example: {
       title: "Prevent two buyers from buying the last item",
@@ -157,6 +161,7 @@ export const systemDesignStudyGuides = {
     references: [s.storage],
   },
   4: {
+    ...systemDesignPractice[4],
     minutes: [25, 100, 35, 20],
     example: {
       title: "A high hit rate can still overload the source",
@@ -208,6 +213,7 @@ export const systemDesignStudyGuides = {
     references: [s.caching, s.overload],
   },
   5: {
+    ...systemDesignPractice[5],
     minutes: [30, 140, 50, 20],
     example: {
       title: "Survive a worker crash after sending an email",
@@ -259,6 +265,7 @@ export const systemDesignStudyGuides = {
     references: [s.kafka, s.retries],
   },
   6: {
+    ...systemDesignPractice[6],
     minutes: [30, 140, 50, 20],
     example: {
       title: "A lease expires while its old holder is paused",
@@ -310,6 +317,7 @@ export const systemDesignStudyGuides = {
     references: [s.raft, s.storage],
   },
   7: {
+    ...systemDesignPractice[7],
     minutes: [25, 100, 35, 20],
     example: {
       title: "Spend an availability budget deliberately",
@@ -359,6 +367,7 @@ export const systemDesignStudyGuides = {
     references: [s.slos, s.overload, s.retries],
   },
   8: {
+    ...systemDesignPractice[8],
     minutes: [25, 100, 35, 20],
     example: {
       title: "The average is healthy while one tenant is failing",
@@ -409,6 +418,7 @@ export const systemDesignStudyGuides = {
     references: [s.monitoring, s.slos],
   },
   9: {
+    ...systemDesignPractice[9],
     minutes: [25, 100, 35, 20],
     example: {
       title: "An authenticated user requests another tenant's file",
@@ -458,6 +468,7 @@ export const systemDesignStudyGuides = {
     references: [s.security],
   },
   10: {
+    ...systemDesignPractice[10],
     minutes: [25, 100, 35, 20],
     example: {
       title: "Fail over without forgetting the missing writes",
@@ -507,6 +518,7 @@ export const systemDesignStudyGuides = {
     references: [s.raft, s.loadBalancing, s.slos],
   },
   11: {
+    ...systemDesignPractice[11],
     minutes: [30, 140, 50, 20],
     example: {
       title: "Plan serving capacity in tokens and headroom",
@@ -557,6 +569,7 @@ export const systemDesignStudyGuides = {
     references: [s.serving, s.overload],
   },
   12: {
+    ...systemDesignPractice[12],
     minutes: [30, 190, 60, 20],
     example: {
       title: "A knowledge assistant loses permission midway through a run",
@@ -606,6 +619,7 @@ export const systemDesignStudyGuides = {
     references: [s.rag, s.agents, s.injection],
   },
   13: {
+    ...systemDesignPractice[13],
     minutes: [30, 210, 100, 20],
     example: {
       title: "The same feed design meets two very different accounts",
@@ -656,6 +670,7 @@ export const systemDesignStudyGuides = {
     references: [s.kafka, s.caching, s.slos],
   },
   14: {
+    ...systemDesignPractice[14],
     minutes: [25, 140, 55, 20],
     example: {
       title: "Make a reversible choice with a clear switch trigger",
@@ -706,6 +721,7 @@ export const systemDesignStudyGuides = {
     references: [s.storage, s.slos, s.overload],
   },
   15: {
+    ...systemDesignPractice[15],
     minutes: [25, 95, 100, 20],
     example: {
       title: "Recover when the interviewer removes a region",

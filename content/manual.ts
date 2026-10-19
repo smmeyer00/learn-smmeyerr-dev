@@ -1,8 +1,8 @@
 /**
- * Field manual content: scale formulas, availability budgets, AI-system
+ * Manual content: scale formulas, availability budgets, AI-system
  * metrics, the 50-minute checklist, and the FACT frame. Ported verbatim
  * from handoff §7 ("Cross-course practice surfaces"); print-friendly
- * rendering lives in `app/field-manual/page.tsx` plus global print CSS.
+ * rendering lives in `app/manual/page.tsx` plus global print CSS.
  */
 
 export type ManualSection = {
@@ -12,7 +12,7 @@ export type ManualSection = {
   rows: { label: string; value: string }[];
 };
 
-export const fieldManual: ManualSection[] = [
+export const manual: ManualSection[] = [
   {
     id: "scale-formulas",
     title: "scale formulas",

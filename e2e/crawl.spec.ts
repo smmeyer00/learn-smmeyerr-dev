@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { courses } from "../content/index";
+import { guidedExercises } from "../content/guided-exercises";
 
 /**
  * Route crawl: every static URL derived from content, visited in a real
@@ -10,12 +11,13 @@ import { courses } from "../content/index";
 
 const urls: string[] = [
   "/",
-  "/about-this-course",
+  "/about",
   "/drills",
   "/mock",
-  "/field-manual",
+  "/manual",
   "/glossary",
 ];
+urls.push(...guidedExercises.map((exercise) => "/drills/" + exercise.id));
 for (const course of courses) {
   urls.push(`/${course.slug}`);
   for (const chapter of course.chapters) {
@@ -36,7 +38,7 @@ test.describe("route crawl", () => {
       expect(response?.status(), `${url} status`).toBe(200);
       await expect(page.locator("#main")).toBeAttached();
       await expect(page.locator("h1").first()).toBeVisible();
-      if (url.split("/").length === 3) {
+      if (url.split("/").length === 3 && !url.startsWith("/drills/")) {
         await expect(
           page.getByRole("heading", { name: "worked example", exact: true }),
         ).toBeVisible();

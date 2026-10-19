@@ -127,12 +127,22 @@
   }
   html {
     @apply font-sans;
+    scroll-padding-top: 4rem;
   }
   ::selection {
     @apply bg-primary text-primary-foreground;
   }
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-ring;
+  }
+  /* Reserve the grid column, but pin its short contents from the first
+     pixel of scrolling. Short screens use the document flow instead. */
+  @media (min-width: 64rem) and (min-height: 36rem) {
+    .home-index-sidebar {
+      position: fixed;
+      top: 7.5rem;
+      width: 14rem;
+    }
   }
   /* No animation ships in labs or reveals (native details, static SVG
      updates), but kill any residual motion for users who ask. */

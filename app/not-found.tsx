@@ -23,10 +23,10 @@ export default function NotFound() {
               Browse courses →
             </Link>
             <Link
-              href="/about-this-course"
+              href="/about"
               className="inline-flex min-h-11 items-center text-muted-foreground underline underline-offset-4"
             >
-              How to study
+              About the courses
             </Link>
           </div>
         </div>

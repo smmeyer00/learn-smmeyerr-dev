@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { buildRedoQueue } from "@/content/drills";
 import { useProgress } from "@/lib/progress";
+import { guidedReviewState } from "@/lib/guided-practice";
+import type { GuidedExerciseSummary } from "@/content/guided-exercises/types";
 import {
   chapterReviewQueue,
   type ChapterReview,
@@ -33,9 +35,11 @@ function ReviewLink({ row }: { row: ChapterReview }) {
 export function PracticeQueue({
   chapters,
   includeDrills = true,
+  guidedExercises = [],
 }: {
   chapters: StudyChapter[];
   includeDrills?: boolean;
+  guidedExercises?: GuidedExerciseSummary[];
 }) {
   const progress = useProgress();
   const [now, setNow] = useState<number | null>(null);
@@ -54,7 +58,11 @@ export function PracticeQueue({
         (row) => row.state === "weak" || row.state === "due",
       )
     : [];
-  if (chapterRows.length === 0 && drillRows.length === 0) return null;
+  const guidedRows = guidedExercises.map((exercise) => ({
+    exercise,
+    state: guidedReviewState(exercise, progress.guidedExercises[exercise.id], now ?? 0),
+  })).filter((row) => row.state === "weak" || row.state === "due");
+  if (chapterRows.length === 0 && drillRows.length === 0 && guidedRows.length === 0) return null;
 
   return (
     <section
@@ -76,6 +84,18 @@ export function PracticeQueue({
           <ReviewLink key={row.key} row={row} />
         ))}
       </ul>
+      {guidedRows.length > 0 && (
+        <ul className="mt-3 space-y-2">
+          {guidedRows.map(({ exercise, state }) => (
+            <li key={exercise.id}>
+              <Link href={"/drills/" + exercise.id} className="inline-flex min-h-11 items-center text-sm text-foreground underline underline-offset-4 hover:text-primary">
+                {exercise.title}
+              </Link>
+              <span className="ml-2 text-xs text-muted-foreground">{state === "weak" ? "guided practice · revisit recorded gaps" : "guided practice · 48-hour recall"}</span>
+            </li>
+          ))}
+        </ul>
+      )}
       {chapterRows.length > 3 && (
         <details className="mt-2">
           <summary className="min-h-11 cursor-pointer text-sm text-muted-foreground">

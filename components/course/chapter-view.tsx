@@ -10,6 +10,8 @@ import { labsForChapter } from "@/components/labs/registry";
 import { MarkComplete } from "@/components/progress/mark-complete";
 import { Quiz } from "@/components/progress/quiz";
 import { TrackVisit } from "@/components/progress/track-visit";
+import { AssignmentReference, CumulativePractice } from "./chapter-practice";
+import { guidedExerciseSummaries } from "@/content/guided-exercises";
 
 const labelClass = "font-mono text-xs uppercase tracking-[0.12em] text-primary";
 const proseClass = "mt-3 text-base leading-7 text-foreground/90";
@@ -81,6 +83,7 @@ export function ChapterView({
     ["worked-example", "worked example"],
     ...(labs.length ? [["labs", "interactive lab"]] : []),
     ["assignment", "assignment + rubric"],
+    ["cumulative-practice", "cumulative project"],
     ["knowledge-checks", "knowledge checks"],
     ["retrieval", "closed-book recall"],
     ["interview-drill", "interview drill"],
@@ -113,10 +116,10 @@ export function ChapterView({
           ]}
         />
         <div className="py-10 sm:py-14 lg:grid lg:grid-cols-[11rem_minmax(0,1fr)] lg:gap-12">
-          <aside className="mb-8 lg:mb-0">
+          <aside className="mb-8 lg:mb-0 lg:self-start">
             <nav
               aria-label="chapter sections"
-              className="hidden lg:sticky lg:top-6 lg:block lg:max-h-[calc(100svh-3rem)] lg:overflow-y-auto"
+              className="hidden lg:block"
             >
               <p className={labelClass}>on this page</p>
               {sectionLinks}
@@ -291,6 +294,18 @@ export function ChapterView({
                 If a criterion is missing, revise that part of the artifact
                 before rating your practice below.
               </p>
+              <AssignmentReference chapter={chapter} />
+              {guidedExerciseSummaries.filter((exercise) =>
+                exercise.prerequisites.at(-1)?.href === "/" + course.slug + "/" + chapter.slug,
+              ).map((exercise) => (
+                <p key={exercise.id} className="mt-5 text-sm leading-6">
+                  Put this chapter into practice:{" "}
+                  <Link className="text-primary underline underline-offset-4" href={"/drills/" + exercise.id}>{exercise.title} · guided worksheet →</Link>
+                </p>
+              ))}
+            </Section>
+            <Section id="cumulative-practice" title="cumulative practice">
+              <CumulativePractice course={course} chapter={chapter} />
             </Section>
             <Section id="senior-signal" title="senior signal">
               <p className="mt-3 border-l-2 border-primary/60 pl-4 text-base leading-7">

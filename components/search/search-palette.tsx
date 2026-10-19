@@ -10,7 +10,7 @@ const kindLabel: Record<SearchEntry["kind"], string> = {
   glossary: "glossary",
   drill: "drill",
   manual: "manual",
-  guide: "study guide",
+  about: "about",
 };
 
 const OPEN_SEARCH = "learn:open-search";

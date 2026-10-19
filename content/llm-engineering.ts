@@ -1,3 +1,4 @@
+import { llmEngineeringLessons } from "./lessons/llm-engineering";
 import type { Course } from "./types";
 import { llmEngineeringStudyGuides } from "./study-guides/llm-engineering";
 
@@ -8,6 +9,10 @@ export const llmEngineering: Course = {
   description:
     "First-principles AI-system fluency for strong software engineers who are not trying to become ML researchers.",
   scope: "21 chapters · ~73 hours of practice",
+  practiceProject: {
+    title: "Harbor · build and evaluate a support assistant",
+    brief: "Keep one project document and a folder of fictional input/output fixtures for Harbor, a workspace-scoped support assistant. Start with ticket triage and policy-backed drafts at 20 requests/minute, 1,500 input and 200 output tokens/request. Human users remain responsible for consequential actions until you design explicit permissions and approval. Later chapters add retrieval, controlled tools, durable runs, evaluation, security, and scale. Use paper, a text editor, and mocked results; paid APIs are optional. Preserve first attempts, evidence, and revisions within the existing practice budget.",
+  },
   phaseOrder: [
     "Foundations",
     "Serving",
@@ -49,41 +54,7 @@ export const llmEngineering: Course = {
           { label: "Append", detail: "Context grows" },
         ],
       },
-      lessons: [
-        {
-          title: "A model predicts continuations",
-          paragraphs: [
-            "Tokenization maps text into discrete IDs. Given prior tokens, the network produces logits that become a probability distribution. A decoding policy chooses the next token, appends it, and repeats.",
-          ],
-          bullets: [
-            "Tokens are not exactly words",
-            "Context is the model's active input—not permanent memory",
-            "Output length adds sequential latency",
-          ],
-        },
-        {
-          title: "Sampling shapes behavior",
-          paragraphs: [
-            "Lower temperature sharpens relative probabilities; top-p restricts candidates to a high-probability nucleus. Greedy decoding can be repeatable, but infrastructure and model changes may still affect outputs. Determinism is a spectrum.",
-          ],
-          bullets: [
-            "Temperature does not add knowledge",
-            "Sampling diversity can improve brainstorming and hurt exact extraction",
-            "Schema constraints bound form, not factual truth",
-          ],
-        },
-        {
-          title: "Hallucination follows the objective",
-          paragraphs: [
-            "The training objective rewards plausible next tokens, not an internal truth database. When evidence is absent, conflicting, or weak, fluent completion can outrun grounding. Retrieval, tools, abstention, and evals reduce risk at the system level.",
-          ],
-          bullets: [
-            "Confidence language is not calibrated probability",
-            "Capability scales unevenly across tasks",
-            "Training changes parameters; inference applies them",
-          ],
-        },
-      ],
+      lessons: llmEngineeringLessons[1],
       seniorSignal:
         "Explain this without anthropomorphism: “It computes a context-conditioned distribution and generates under a decoding policy; truthfulness is a learned behavior we still verify.”",
       pitfalls: [
@@ -160,41 +131,7 @@ export const llmEngineering: Course = {
           { label: "Repeat", detail: "Residual stack" },
         ],
       },
-      lessons: [
-        {
-          title: "Attention is content-addressed mixing",
-          paragraphs: [
-            "Each position creates a query describing what it seeks, keys describing what positions offer, and values containing information to mix. Query–key similarity becomes weights over values.",
-          ],
-          bullets: [
-            "Causal masks block future positions",
-            "Multiple heads learn different interaction patterns",
-            "Attention moves information; it is not a symbolic database query",
-          ],
-        },
-        {
-          title: "The block has two major jobs",
-          paragraphs: [
-            "Attention combines information across positions; the feed-forward network transforms each position independently. Residual paths preserve and refine representations, while normalization stabilizes computation.",
-          ],
-          bullets: [
-            "Depth composes many small transformations",
-            "Position is required because attention alone is permutation-insensitive",
-            "Outputs become logits over vocabulary",
-          ],
-        },
-        {
-          title: "Long context has real systems cost",
-          paragraphs: [
-            "A dense attention map compares many token pairs, so prefill work and memory rise quickly with sequence length. During decoding, a KV cache avoids recomputing past keys and values but consumes accelerator memory.",
-          ],
-          bullets: [
-            "Long capacity does not guarantee perfect retrieval",
-            "Context selection remains an application concern",
-            "Architecture optimizations can change the exact scaling constants",
-          ],
-        },
-      ],
+      lessons: llmEngineeringLessons[2],
       seniorSignal:
         "Use an example: in “the animal didn't cross the street because it was tired,” one head can weight earlier tokens to refine what “it” represents.",
       pitfalls: [
@@ -272,41 +209,7 @@ export const llmEngineering: Course = {
           { label: "Iterate", detail: "Data + objective" },
         ],
       },
-      lessons: [
-        {
-          title: "Pretraining builds general capability",
-          paragraphs: [
-            "Large corpora and the next-token objective push a model to learn statistical structure of language, code, and domains. Scaling compute, data, and parameters often improves loss predictably, but data quality and architecture matter.",
-          ],
-          bullets: [
-            "Training corpus is filtered and mixed",
-            "Memorization and generalization can coexist",
-            "Cutoff and coverage are product constraints",
-          ],
-        },
-        {
-          title: "Post-training shapes interaction",
-          paragraphs: [
-            "Supervised examples demonstrate target behavior. Preference methods favor outputs people or graders prefer. RL-style optimization can reinforce reasoning or tool-use behavior but inherits reward-model imperfections.",
-          ],
-          bullets: [
-            "Post-training cannot guarantee truth",
-            "Helpful and safe behavior can trade off",
-            "Reward hacking exploits the measured proxy",
-          ],
-        },
-        {
-          title: "Evaluation guards the loop",
-          paragraphs: [
-            "Holdouts, capability suites, safety tests, and human judgments reveal different dimensions. Contamination inflates results when test material appears in training. Synthetic data can scale rare behaviors but amplify teacher biases.",
-          ],
-          bullets: [
-            "Distillation transfers behavior to smaller models",
-            "Evaluate distribution shifts",
-            "Inspect slices, not only one aggregate score",
-          ],
-        },
-      ],
+      lessons: llmEngineeringLessons[3],
       seniorSignal:
         "Stay at the systems boundary: know enough to connect training choices to serving, evaluation, and product behavior; say when optimizer-level detail is outside your role.",
       pitfalls: [
@@ -389,41 +292,7 @@ export const llmEngineering: Course = {
           { label: "Stream", detail: "Cancel + account" },
         ],
       },
-      lessons: [
-        {
-          title: "Prefill and decode are different",
-          paragraphs: [
-            "Prefill processes the prompt in parallel and creates KV state; it drives time to first token and grows with input length. Decode generates sequentially and drives inter-token latency and total completion time.",
-          ],
-          bullets: [
-            "Large prompts compete for memory and prefill capacity",
-            "Long outputs occupy decode slots",
-            "Track latency by stage and token count",
-          ],
-        },
-        {
-          title: "KV cache is the serving currency",
-          paragraphs: [
-            "Caching prior keys/values avoids recomputing the entire sequence on every output token, but memory grows with batch size and sequence length. Memory pressure limits concurrency even when raw compute remains.",
-          ],
-          bullets: [
-            "Quantization reduces weight memory and may affect quality/speed",
-            "Prefix caching reuses shared prompt work",
-            "Eviction policy changes latency predictability",
-          ],
-        },
-        {
-          title: "Scheduling creates the frontier",
-          paragraphs: [
-            "Continuous batching admits new requests as others finish, improving utilization. Tensor parallelism splits operations across devices; pipeline parallelism splits layers/stages. Speculative decoding uses a faster draft path that the target verifies.",
-          ],
-          bullets: [
-            "Batching improves throughput but may add queue delay",
-            "Parallelism adds communication overhead",
-            "Route by workload shape and SLO",
-          ],
-        },
-      ],
+      lessons: llmEngineeringLessons[4],
       seniorSignal:
         "Draw two latency bars: TTFT = admission + queue + prefill; completion = TTFT + decode steps. Then show which optimization attacks each part.",
       pitfalls: [
@@ -505,41 +374,7 @@ export const llmEngineering: Course = {
           { label: "Evaluate", detail: "Cases + regressions" },
         ],
       },
-      lessons: [
-        {
-          title: "Write the acceptance criteria",
-          paragraphs: [
-            "Define task, audience, inputs, constraints, and output shape. Put stable application policy in higher-authority instructions, user intent in user input, and label untrusted retrieved text as data.",
-          ],
-          bullets: [
-            "Examples resolve ambiguity but consume context",
-            "Delimit data from instructions",
-            "State what to do when information is missing",
-          ],
-        },
-        {
-          title: "Constrain interfaces",
-          paragraphs: [
-            "Schema-constrained generation reduces parsing errors and turns free-form output into a typed boundary. Validate again in code; a valid shape can still contain incorrect or unauthorized content.",
-          ],
-          bullets: [
-            "Keep schemas minimal and explicit",
-            "Retry only bounded, repairable failures",
-            "Prefer deterministic calculation outside the model",
-          ],
-        },
-        {
-          title: "Version and evaluate",
-          paragraphs: [
-            "Store prompt/model/tool/schema versions with outcomes. Build golden and adversarial cases before broad rollout. When prompt complexity becomes a brittle decision tree, move logic into code, retrieval, or purpose-built tools.",
-          ],
-          bullets: [
-            "Change one variable when possible",
-            "Score task success, not eloquence",
-            "Use production failures to expand evals",
-          ],
-        },
-      ],
+      lessons: llmEngineeringLessons[5],
       seniorSignal:
         "Use prompts for semantic judgment; use code for permissions, arithmetic, state transitions, and invariants.",
       pitfalls: [
@@ -616,41 +451,7 @@ export const llmEngineering: Course = {
           { label: "Execute", detail: "Result + audit" },
         ],
       },
-      lessons: [
-        {
-          title: "Schema quality drives tool quality",
-          paragraphs: [
-            "Names and descriptions should distinguish when tools apply; argument schemas should make invalid states difficult. Expose only relevant tools to reduce confusion and prompt footprint.",
-          ],
-          bullets: [
-            "Validate types and business rules server-side",
-            "Never let tool descriptions grant permission",
-            "Use stable call IDs for tracing and deduplication",
-          ],
-        },
-        {
-          title: "Parallelism follows dependencies",
-          paragraphs: [
-            "Independent reads can run concurrently; a call that needs an earlier result must wait. Your orchestrator should express dependency edges, set deadlines, aggregate errors, and return compact results.",
-          ],
-          bullets: [
-            "Parallel writes can conflict",
-            "Tool results are still untrusted data",
-            "Bound result size before reinserting into context",
-          ],
-        },
-        {
-          title: "Side effects need control",
-          paragraphs: [
-            "Classify tools by risk. Reads may auto-run under policy; reversible writes may need preview; destructive or external actions may require explicit human approval. Use scoped credentials and sandboxing.",
-          ],
-          bullets: [
-            "Retry reads more freely than non-idempotent writes",
-            "Return explicit errors, not invented substitutes",
-            "Audit actor, arguments, policy, result, and effect",
-          ],
-        },
-      ],
+      lessons: llmEngineeringLessons[6],
       seniorSignal:
         "Say exactly where authority lives: the model has semantic discretion; the executor has security authority.",
       pitfalls: [
@@ -727,41 +528,7 @@ export const llmEngineering: Course = {
           { label: "Check", detail: "Progress + stop" },
         ],
       },
-      lessons: [
-        {
-          title: "Use agents for uncertain paths",
-          paragraphs: [
-            "If a fixed DAG can express the workflow, use it: it is cheaper, easier to test, and more predictable. Use an agent when new observations change the next action and semantic judgment is central.",
-          ],
-          bullets: [
-            "Keep deterministic outer orchestration",
-            "Define completion evidence",
-            "Give the model the smallest useful action space",
-          ],
-        },
-        {
-          title: "State outlives context",
-          paragraphs: [
-            "Persist task state, tool results, artifacts, approvals, and checkpoints outside the prompt. Summarize or retrieve relevant history into context. A worker crash should not erase the run.",
-          ],
-          bullets: [
-            "Use explicit state machines for lifecycle",
-            "Commit checkpoints after durable effects",
-            "Separate user memory from task scratch state",
-          ],
-        },
-        {
-          title: "Every loop needs a budget and stop rule",
-          paragraphs: [
-            "Limit wall time, tokens, cost, calls, repeated actions, and privileges. Detect non-progress, oscillation, and duplicate calls. Escalate to a human or return a partial result with evidence.",
-          ],
-          bullets: [
-            "Approval pauses are durable states",
-            "Replanning follows changed observations",
-            "Multiple agents add coordination and context cost",
-          ],
-        },
-      ],
+      lessons: llmEngineeringLessons[7],
       seniorSignal:
         "Define the agent's success condition and maximum autonomy before describing the planner.",
       pitfalls: [
@@ -840,41 +607,7 @@ export const llmEngineering: Course = {
           { label: "Generate", detail: "Cite + abstain" },
         ],
       },
-      lessons: [
-        {
-          title: "Chunk for the question shape",
-          paragraphs: [
-            "Chunks should be coherent enough to answer likely questions and small enough to rank precisely. Preserve headings, source location, timestamps, and permissions. Consider hierarchical parent/child retrieval for long documents.",
-          ],
-          bullets: [
-            "Overlap repairs boundary loss but creates duplicates",
-            "Tables and code need structure-aware parsing",
-            "Index updates and deletes need lifecycle tracking",
-          ],
-        },
-        {
-          title: "Hybrid retrieval covers different failure modes",
-          paragraphs: [
-            "Lexical search excels at exact identifiers and rare terms; semantic search covers paraphrase and concept similarity. Metadata filters enforce scope; rerankers spend more compute on a small candidate set.",
-          ],
-          bullets: [
-            "Vector similarity is not authority",
-            "Diversify near-duplicate chunks",
-            "Tune candidate count separately from final context count",
-          ],
-        },
-        {
-          title: "Evaluate retrieval before prose",
-          paragraphs: [
-            "Build queries with known relevant evidence. Measure recall@k and ranking, then evaluate citation support, answer completeness, and abstention. Inspect missing-context and conflicting-source slices.",
-          ],
-          bullets: [
-            "Too much context can distract and raise cost",
-            "Prefer recent/authoritative sources via metadata",
-            "Make evidence visible to users when useful",
-          ],
-        },
-      ],
+      lessons: llmEngineeringLessons[8],
       seniorSignal:
         "In an interview, separate retrieval recall, context precision, and generation faithfulness. Each needs different fixes.",
       pitfalls: [
@@ -951,41 +684,7 @@ export const llmEngineering: Course = {
           { label: "Filter", detail: "Task + metadata" },
         ],
       },
-      lessons: [
-        {
-          title: "Similarity depends on geometry",
-          paragraphs: [
-            "Cosine compares direction, dot product includes magnitude, and Euclidean measures straight-line distance. If vectors are normalized, cosine and dot-product ranking align. Use the metric expected by the embedding/index setup.",
-          ],
-          bullets: [
-            "Thresholds are dataset-specific",
-            "Nearest does not mean correct",
-            "Domain language can shift neighborhoods",
-          ],
-        },
-        {
-          title: "ANN trades exactness for speed",
-          paragraphs: [
-            "Scanning every vector is simple but expensive at large N. Approximate nearest-neighbor indexes prune the search space, trading memory, build/update cost, and some recall for latency.",
-          ],
-          bullets: [
-            "Tune recall vs latency empirically",
-            "Filter strategy affects index performance",
-            "Deletes and model upgrades require lifecycle plans",
-          ],
-        },
-        {
-          title: "Embeddings are reusable features",
-          paragraphs: [
-            "Beyond search, vectors support clustering, nearest-neighbor classification, recommendations, anomaly hints, and duplicate detection. For final decisions, combine them with labels, rules, and evaluation.",
-          ],
-          bullets: [
-            "Use hard negatives that look deceptively similar",
-            "Version embedding model with the index",
-            "Re-embed or dual-index during migrations",
-          ],
-        },
-      ],
+      lessons: llmEngineeringLessons[9],
       seniorSignal:
         "State the metric and normalization assumption; then name the target recall/latency curve you would measure.",
       pitfalls: [
@@ -1067,41 +766,7 @@ export const llmEngineering: Course = {
           { label: "Reconcile", detail: "Fresh + permitted?" },
         ],
       },
-      lessons: [
-        {
-          title: "Budget the window",
-          paragraphs: [
-            "Allocate space among policy, task instructions, current user input, recent turns, retrieved knowledge, tool results, and output headroom. Truncate by semantics, not raw oldest-first token count.",
-          ],
-          bullets: [
-            "Keep critical instructions stable and visible",
-            "Summaries lose detail and can encode mistakes",
-            "Large tool results should be compacted or referenced",
-          ],
-        },
-        {
-          title: "Memory is selective persistence",
-          paragraphs: [
-            "Separate ephemeral task state, conversation summaries, explicit preferences, and inferred facts. Store provenance, timestamp, confidence, sensitivity, and scope. Retrieve by relevance plus recency and policy.",
-          ],
-          bullets: [
-            "Do not store everything said",
-            "Let users inspect/correct/delete durable memory",
-            "Avoid carrying preferences across incompatible contexts",
-          ],
-        },
-        {
-          title: "Reconcile contradictions",
-          paragraphs: [
-            "New information can supersede old, sources can disagree, and summaries can drift. Use versions and provenance, prefer explicit recent user statements, and ask when conflicts materially affect action.",
-          ],
-          bullets: [
-            "Context rot is quality degradation, not only overflow",
-            "Compression checkpoints need validation",
-            "Sensitive memory deserves stricter defaults",
-          ],
-        },
-      ],
+      lessons: llmEngineeringLessons[10],
       seniorSignal:
         "Treat memory as data product with consent, provenance, and evaluation—not a bigger prompt buffer.",
       pitfalls: [
@@ -1183,41 +848,7 @@ export const llmEngineering: Course = {
           { label: "Ship", detail: "Gate + monitor" },
         ],
       },
-      lessons: [
-        {
-          title: "Start from failure taxonomy",
-          paragraphs: [
-            "Define what can go wrong—wrong answer, unsupported claim, missed tool, unsafe action, bad refusal—and build cases for each. Include easy, hard, boundary, adversarial, and real production examples.",
-          ],
-          bullets: [
-            "Keep development and holdout sets separate",
-            "Version data and grading rubrics",
-            "Stratify results by meaningful slice",
-          ],
-        },
-        {
-          title: "Graders need evaluation too",
-          paragraphs: [
-            "Exact checks fit schemas and known answers; code graders fit executable properties; model judges fit nuanced comparisons. Calibrate automated graders against blinded human labels and inspect disagreement.",
-          ],
-          bullets: [
-            "Pairwise is often easier than absolute scoring",
-            "Avoid judging style when correctness matters",
-            "Use multiple signals for high-stakes gates",
-          ],
-        },
-        {
-          title: "Close the online loop",
-          paragraphs: [
-            "Offline improvement may not improve user outcomes. Canary and A/B test meaningful changes, observe latency/cost/safety, and mine failures back into the suite without contaminating the holdout.",
-          ],
-          bullets: [
-            "Log model, prompt, retrieval, and tool versions",
-            "Watch Goodhart effects",
-            "Re-evaluate when traffic shifts",
-          ],
-        },
-      ],
+      lessons: llmEngineeringLessons[11],
       seniorSignal:
         "Say: “I would not ship from a single aggregate score. I need the regression slices, cost/latency delta, and human-calibrated grader agreement.”",
       pitfalls: [
@@ -1321,41 +952,7 @@ export const llmEngineering: Course = {
           { label: "Record", detail: "Case + metric" },
         ],
       },
-      lessons: [
-        {
-          title: "Different failures need different responses",
-          paragraphs: [
-            "Transient transport errors may retry; invalid structured output may use constrained repair; a missing document needs retrieval fallback; unsafe or low-confidence high-impact output may require abstention or review.",
-          ],
-          bullets: [
-            "Do not retry deterministic bad inputs",
-            "Preserve one operation ID across retries",
-            "Bound total attempts inside deadline/cost",
-          ],
-        },
-        {
-          title: "Fallback is a product decision",
-          paragraphs: [
-            "A smaller or different model can change quality, tool support, context, or safety behavior. Validate compatibility and disclose material degradation. Sometimes a queued or explicit failure is safer than silent fallback.",
-          ],
-          bullets: [
-            "Circuit-break unhealthy routes",
-            "Hedge only when cost and duplicate effects are controlled",
-            "Test fallback paths continuously",
-          ],
-        },
-        {
-          title: "Guardrails surround, not replace, the model",
-          paragraphs: [
-            "Validate schemas, permissions, tool arguments, token budgets, citation requirements, and state transitions in code. Track unknown outcomes after timeouts and reconcile durable effects.",
-          ],
-          bullets: [
-            "Cancellation must propagate to model and tools",
-            "Use resumable checkpoints for long tasks",
-            "Turn every incident into an eval case",
-          ],
-        },
-      ],
+      lessons: llmEngineeringLessons[12],
       seniorSignal:
         "Produce a failure matrix: failure → detection → user impact → automatic action → audit/metric. It shows operational maturity fast.",
       pitfalls: [
@@ -1437,41 +1034,7 @@ export const llmEngineering: Course = {
           { label: "Contain", detail: "Sandbox + audit" },
         ],
       },
-      lessons: [
-        {
-          title: "Prompt injection crosses channels",
-          paragraphs: [
-            "A webpage, document, email, or code comment can contain instructions aimed at the model. Delimit and label it as data, minimize what is retrieved, and never let content modify permissions or reveal hidden instructions.",
-          ],
-          bullets: [
-            "Instruction hierarchy helps but is not a complete boundary",
-            "Treat tool output as untrusted",
-            "Do not put secrets in model-visible context unless required",
-          ],
-        },
-        {
-          title: "Least privilege limits model mistakes",
-          paragraphs: [
-            "Give each run scoped credentials, tools, paths, network destinations, time, and spend. Re-authorize at execution using trusted identity and current state. Sandbox untrusted code and block cross-tenant access.",
-          ],
-          bullets: [
-            "Separate planning from execution",
-            "Preview and approve high-impact actions",
-            "Make irreversible actions rare and explicit",
-          ],
-        },
-        {
-          title: "Layer controls and measure bypass",
-          paragraphs: [
-            "Combine input validation, retrieval ACLs, model policy, output checks, tool authorization, sandboxing, rate limits, monitoring, and incident response. Red-team realistic end-to-end flows.",
-          ],
-          bullets: [
-            "Moderation is one layer, not the architecture",
-            "Log security decisions without leaking sensitive content",
-            "Test attacks after model or tool changes",
-          ],
-        },
-      ],
+      lessons: llmEngineeringLessons[13],
       seniorSignal:
         "Phrase the invariant: “No model-visible string can increase its authority; only trusted policy can.”",
       pitfalls: [
@@ -1548,41 +1111,7 @@ export const llmEngineering: Course = {
           { label: "Learn", detail: "Feedback + eval" },
         ],
       },
-      lessons: [
-        {
-          title: "Choose on a measured frontier",
-          paragraphs: [
-            "Compare candidates on your task dataset across quality, latency, token cost, tool correctness, context, and operational limits. Route simple/low-risk work cheaply and escalate hard or high-value cases.",
-          ],
-          bullets: [
-            "Model families evolve; isolate provider-specific details",
-            "Cache and shorten context before indiscriminate downgrades",
-            "Budget cost per successful outcome",
-          ],
-        },
-        {
-          title: "Design uncertainty into UX",
-          paragraphs: [
-            "Stream when partial text is useful; use progress/checkpoints for long jobs; expose citations and editable outputs where verification matters. Provide cancel, retry, and recovery without duplicate effects.",
-          ],
-          bullets: [
-            "Do not stream irreversible decisions",
-            "Preserve partial artifacts",
-            "Make fallbacks and limitations legible",
-          ],
-        },
-        {
-          title: "Feedback needs interpretation",
-          paragraphs: [
-            "Thumbs signals are sparse and biased. Pair them with edits, task completion, abandon rates, escalation, latency, and qualitative review. Turn recurrent failures into eval cases.",
-          ],
-          bullets: [
-            "Optimize user outcome, not answer length",
-            "Watch quality by segment",
-            "Include safety and cost in launch gates",
-          ],
-        },
-      ],
+      lessons: llmEngineeringLessons[14],
       seniorSignal:
         "Frame model choice as an empirical product decision: task distribution × acceptable failure × latency/cost budget.",
       pitfalls: [
@@ -1664,41 +1193,7 @@ export const llmEngineering: Course = {
           { label: "Agent", detail: "Adaptive loop" },
         ],
       },
-      lessons: [
-        {
-          title: "Start at the left",
-          paragraphs: [
-            "Classification or extraction often needs one constrained model call. Add retrieval when knowledge is external/fresh, tools when deterministic capability or action is needed, and an agent loop only when the path adapts to observations.",
-          ],
-          bullets: [
-            "Batch offline work when latency is loose",
-            "Use schemas at machine interfaces",
-            "Keep final effects deterministic and authorized",
-          ],
-        },
-        {
-          title: "Architecture follows verification",
-          paragraphs: [
-            "A research system needs citation coverage; a coding assistant needs tests/diffs; support needs account and policy checks; data analysis needs executable computation and artifact inspection.",
-          ],
-          bullets: [
-            "Design evidence of completion",
-            "Capture intermediate artifacts",
-            "Choose approval around consequence, not buzzwords",
-          ],
-        },
-        {
-          title: "Workflow engines and agents can coexist",
-          paragraphs: [
-            "An explicit workflow can call a model inside known steps and hand a bounded subproblem to an agent. This hybrid often gives flexibility without surrendering control.",
-          ],
-          bullets: [
-            "State transitions stay durable",
-            "Agent receives scoped goal and tools",
-            "Workflow owns retries, deadlines, and compensation",
-          ],
-        },
-      ],
+      lessons: llmEngineeringLessons[15],
       seniorSignal:
         "For any AI prompt, say which of four levels applies: generate, retrieve, tool, or agent—and why the simpler previous level is insufficient.",
       pitfalls: [
@@ -1776,41 +1271,7 @@ export const llmEngineering: Course = {
           { label: "Verify", detail: "Run + repair" },
         ],
       },
-      lessons: [
-        {
-          title: "Navigation beats full ingestion",
-          paragraphs: [
-            "Large repositories do not fit coherently in context. Search filenames and symbols, read local instructions, trace call sites, and load only the slice needed. Maintain a compact map of decisions and open questions.",
-          ],
-          bullets: [
-            "Repository state is the source of truth",
-            "Generated/vendor areas have different ownership",
-            "Search before guessing APIs",
-          ],
-        },
-        {
-          title: "Edits are hypotheses",
-          paragraphs: [
-            "A plan predicts which files and behaviors must change. Apply small patches, inspect diffs, and use compiler/tests as high-signal feedback. Interpret failures before broad changes.",
-          ],
-          bullets: [
-            "Preserve unrelated user changes",
-            "Prefer reversible, scoped mutations",
-            "Checkpoint after coherent verified milestones",
-          ],
-        },
-        {
-          title: "Long horizon requires external state",
-          paragraphs: [
-            "Persist plan, completed steps, test evidence, patch state, and budgets. Sandbox execution and gate privileged network, secrets, deployments, and destructive commands. Detect repeated failing cycles.",
-          ],
-          bullets: [
-            "Autocomplete has immediate human steering; agents must self-correct",
-            "Compaction must preserve constraints and unresolved failures",
-            "Review final diff against the original request",
-          ],
-        },
-      ],
+      lessons: llmEngineeringLessons[16],
       seniorSignal:
         "Connect this to your engineering background: deterministic orchestration, clear contracts, and explicit ownership around a probabilistic planner are strong experience stories.",
       pitfalls: [
@@ -1888,41 +1349,7 @@ export const llmEngineering: Course = {
           { label: "Account", detail: "Actual + outcome" },
         ],
       },
-      lessons: [
-        {
-          title: "Rate limits need token awareness",
-          paragraphs: [
-            "Request count hides a 100-token extraction versus a 100k-token agent turn. Combine request, token, concurrency, and spend budgets. Reserve estimated usage on admission, then reconcile actual input/output/tool cost.",
-          ],
-          bullets: [
-            "Separate tenant and global fleet limits",
-            "Expose truthful retry/queue semantics",
-            "Protect high-priority capacity",
-          ],
-        },
-        {
-          title: "The gateway owns cross-cutting policy",
-          paragraphs: [
-            "Centralize supported-model mapping, retries, routing, fallbacks, usage, tracing, and safety hooks without hiding capability differences. Avoid a lowest-common-denominator interface that erases streaming or tool semantics.",
-          ],
-          bullets: [
-            "Version routing policy",
-            "Circuit-break unhealthy models/regions",
-            "Preserve provider request IDs for debugging",
-          ],
-        },
-        {
-          title: "Capacity is token-shaped",
-          paragraphs: [
-            "Forecast queued input/output tokens, context distributions, cache hit rates, and model mix—not only RPS. Regional headroom and fallback capacity must handle correlated demand or fleet loss.",
-          ],
-          bullets: [
-            "Cancel disconnected work",
-            "Batch offline traffic",
-            "Degrade by context, model, priority, or async path",
-          ],
-        },
-      ],
+      lessons: llmEngineeringLessons[17],
       seniorSignal:
         "Estimate tokens/sec and KV occupancy alongside RPS. This is the bridge from classic capacity planning to inference systems.",
       pitfalls: [
@@ -2005,41 +1432,7 @@ export const llmEngineering: Course = {
           { label: "Evaluation", detail: "Measure behavior" },
         ],
       },
-      lessons: [
-        {
-          title: "Understand the provider's application primitive",
-          paragraphs: [
-            "Modern provider APIs represent messages, content, actions, and tool calls through structured request and response types. OpenAI's Responses API is one concrete example; other providers expose similar capabilities through different contracts. Build around the durable concepts rather than one vendor's naming.",
-          ],
-          bullets: [
-            "Keep an internal adapter around vendor specifics",
-            "Use typed streaming lifecycle events",
-            "Persist your own product state and audit semantics",
-          ],
-        },
-        {
-          title: "Choose real-time architecture by interaction",
-          paragraphs: [
-            "Realtime sessions keep a low-latency connection open for live audio, conversation events, and tools. Request-based APIs remain simpler for bounded transcription or speech tasks. Server-side controls keep business logic and credentials away from clients.",
-          ],
-          bullets: [
-            "WebRTC fits client media; WebSocket fits server connections",
-            "Handle interruption and cancellation",
-            "Measure audio/session cost separately",
-          ],
-        },
-        {
-          title: "Documentation is part of the design process",
-          paragraphs: [
-            "Model availability, tool support, rate limits, and deprecations are update-sensitive. Verify them in the selected provider's official documentation at implementation time; protect product behavior with capability checks, adapters, evals, and staged migrations.",
-          ],
-          bullets: [
-            "Do not couple product contracts to one model alias",
-            "Pin/version behavior where needed",
-            "Re-run evals before model or prompt migration",
-          ],
-        },
-      ],
+      lessons: llmEngineeringLessons[18],
       seniorSignal:
         "Say: “I know the durable platform primitives; I would verify current model and tool support in the provider's official documentation before locking the implementation.”",
       pitfalls: [
@@ -2155,41 +1548,7 @@ export const llmEngineering: Course = {
           { label: "Agent", detail: "Adaptive actions" },
         ],
       },
-      lessons: [
-        {
-          title: "Choose the lever that matches the gap",
-          paragraphs: [
-            "Prompt when the model has context and needs clearer specification. Retrieve when evidence is missing or private. Add tools for exact data/actions. Fine-tune for repeated behavioral/style/task gaps supported by enough data. Add an agent only for adaptive paths.",
-          ],
-          bullets: [
-            "Do not fine-tune facts that change frequently",
-            "Do not RAG arithmetic",
-            "Do not agentize a fixed workflow",
-          ],
-        },
-        {
-          title: "Bound autonomy by consequence",
-          paragraphs: [
-            "Let the model classify, draft, prioritize, and propose. Deterministic systems validate, authorize, commit, and audit. Increase approval and isolation as reversibility decreases and impact rises.",
-          ],
-          bullets: [
-            "Read-only differs from money or external communication",
-            "Make budgets and stop conditions explicit",
-            "Prefer preview → approve → execute",
-          ],
-        },
-        {
-          title: "Make probabilistic correctness measurable",
-          paragraphs: [
-            "Define success cases, tolerated errors, abstention policy, and human escalation. Measure end-to-end task completion by slice plus latency, cost, and safety.",
-          ],
-          bullets: [
-            "Model confidence is not enough",
-            "Verification can use tools, citations, tests, or humans",
-            "Design partial success intentionally",
-          ],
-        },
-      ],
+      lessons: llmEngineeringLessons[19],
       seniorSignal:
         "For every model decision, ask: What evidence can verify it? What happens if it is wrong? Can the effect be reversed?",
       pitfalls: [
@@ -2272,41 +1631,7 @@ export const llmEngineering: Course = {
           { label: "Learn", detail: "Evals + feedback" },
         ],
       },
-      lessons: [
-        {
-          title: "Vary the deep dive",
-          paragraphs: [
-            "For conversation storage, go deep on ordering/deletion. For inference, scheduling/KV/admission. For agents, state/checkpoints/tools. For RAG, ACLs/freshness/evaluation. For voice, interruption and latency.",
-          ],
-          bullets: [
-            "Reuse the execution framework",
-            "State model vs system failure separately",
-            "Always include cost and safety",
-          ],
-        },
-        {
-          title: "Add constraint cards",
-          paragraphs: [
-            "After 20 minutes, inject one change: a region fails, one tenant drives 40% of traffic, context doubles, a provider rate-limits, a tool has side effects, or retention law changes.",
-          ],
-          bullets: [
-            "Revise the smallest boundary",
-            "Preserve the product invariant",
-            "Explain migration and operational impact",
-          ],
-        },
-        {
-          title: "Score evidence, not confidence",
-          paragraphs: [
-            "Use five dimensions from 1–4: framing, correctness, depth, tradeoffs, and communication/recovery. Keep one concrete note and one next drill per dimension.",
-          ],
-          bullets: [
-            "Record at least half the mocks",
-            "Repeat weak designs after 48 hours",
-            "Seek adversarial follow-up questions",
-          ],
-        },
-      ],
+      lessons: llmEngineeringLessons[20],
       seniorSignal:
         "A strong AI design closes with: eval gate, production SLOs, cost attribution, abuse boundary, and safe fallback.",
       pitfalls: [
@@ -2390,41 +1715,7 @@ export const llmEngineering: Course = {
           { label: "Bound", detail: "Honest unknowns" },
         ],
       },
-      lessons: [
-        {
-          title: "Build the five-minute stack",
-          paragraphs: [
-            "Explain tokens and next-token distributions; attention as learned information mixing; prefill vs decode and KV memory; retrieval/tools as external grounding/action; evals and deterministic controls around variable output.",
-          ],
-          bullets: [
-            "Use one diagram and one product consequence",
-            "Avoid magical language",
-            "Answer the level asked before going deeper",
-          ],
-        },
-        {
-          title: "Diagnose by layer",
-          paragraphs: [
-            "A bad answer may come from missing model capability, weak prompt, poor retrieval, stale context, incorrect tool, orchestration bug, policy block, or UX mismatch. Ask for traces and counterfactual tests.",
-          ],
-          bullets: [
-            "Swap evidence/model/tool one at a time",
-            "Reproduce with stored versions",
-            "Distinguish availability from quality",
-          ],
-        },
-        {
-          title: "State your boundary well",
-          paragraphs: [
-            "Say: ‘I do not know the optimizer-level detail, but for the serving/product system I would reason from these constraints…’ Then proceed concretely. Honest scope plus strong adjacent reasoning beats bluffing.",
-          ],
-          bullets: [
-            "Know vocabulary without pretending research depth",
-            "Connect to distributed systems expertise",
-            "Ask what evidence would resolve uncertainty",
-          ],
-        },
-      ],
+      lessons: llmEngineeringLessons[21],
       seniorSignal:
         "Existing software-engineering experience is an asset: translate service ownership, client/server contracts, release mechanisms, and production operations into examples of boundaries, rollouts, observability, and deterministic control around model behavior.",
       pitfalls: [

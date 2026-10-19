@@ -21,6 +21,15 @@
  */
 
 import { useSyncExternalStore } from "react";
+import {
+  migrateGuidedExercises,
+  validGuidedImport,
+  newGuidedDraft,
+  makeGuidedAttempt,
+  type GuidedDraft,
+  type GuidedExerciseState,
+} from "./guided-practice";
+import type { GuidedExercise } from "../content/guided-exercises/types";
 
 export const STORAGE_KEY = "learn.smmeyer.dev:progress:v1";
 export const SCHEMA_VERSION = 1 as const;
@@ -56,6 +65,8 @@ export type ProgressStateV1 = {
   lessonPositions: Record<string, string>;
   quizAttempts: Record<string, QuizAttempt[]>;
   drillAttempts: DrillAttempt[];
+  /** Additive v1 field: guided worksheets and reviewed attempts; old exports migrate to {}. */
+  guidedExercises: Record<string, GuidedExerciseState>;
   bookmarks: string[];
   /** free-form notes per chapter key; writers must debounce */
   notes: Record<string, string>;
@@ -74,6 +85,7 @@ export function defaultProgress(): ProgressStateV1 {
     lessonPositions: {},
     quizAttempts: {},
     drillAttempts: [],
+    guidedExercises: {},
     bookmarks: [],
     notes: {},
     lastVisited: undefined,
@@ -154,6 +166,7 @@ export function migrateProgress(raw: unknown): ProgressStateV1 {
     lessonPositions,
     quizAttempts,
     drillAttempts,
+    guidedExercises: migrateGuidedExercises(data.guidedExercises),
     bookmarks: asStringArray(data.bookmarks),
     notes,
     ...(lastVisited ? { lastVisited } : {}),
@@ -332,6 +345,47 @@ export function recordDrillAttempt(attempt: DrillAttempt): void {
     drillAttempts: [...prev.drillAttempts, attempt],
   }));
 }
+
+export function saveGuidedDraft(id: string, draft: GuidedDraft): void {
+  update((prev) => ({
+    ...prev,
+    guidedExercises: {
+      ...prev.guidedExercises,
+      [id]: { draft, attempts: prev.guidedExercises[id]?.attempts ?? [] },
+    },
+  }));
+}
+
+export function finishGuidedExercise(exercise: GuidedExercise, draft: GuidedDraft, completedAt: string): void {
+  const attempt = makeGuidedAttempt(exercise, draft, completedAt);
+  if (!attempt) return;
+  const id = exercise.id;
+  update((prev) => {
+    if (prev.guidedExercises[id]?.draft.stage === "complete") return prev;
+    return {
+      ...prev,
+      guidedExercises: {
+        ...prev.guidedExercises,
+        [id]: { draft: attempt, attempts: [...(prev.guidedExercises[id]?.attempts ?? []), attempt] },
+      },
+    };
+  });
+}
+
+/** Retry is offered only after saving; every previous reviewed artifact remains in history. */
+export function retryGuidedExercise(id: string, version: number): void {
+  update((prev) => {
+    const current = prev.guidedExercises[id];
+    if (!current || current.draft.stage !== "complete") return prev;
+    return {
+      ...prev,
+      guidedExercises: {
+        ...prev.guidedExercises,
+        [id]: { draft: newGuidedDraft(version), attempts: current.attempts },
+      },
+    };
+  });
+}
 export function recordVisit(key: string): void {
   if (!isClient()) return;
   if (getSnapshot().lastVisited === key) return;
@@ -361,6 +415,7 @@ const PROGRESS_KEYS = [
   "lessonPositions",
   "quizAttempts",
   "drillAttempts",
+  "guidedExercises",
   "bookmarks",
   "notes",
   "lastVisited",
@@ -372,6 +427,7 @@ export function hasProgressData(state: ProgressStateV1): boolean {
   return (
     state.completedChapters.length > 0 ||
     state.drillAttempts.length > 0 ||
+    Object.keys(state.guidedExercises).length > 0 ||
     state.bookmarks.length > 0 ||
     Object.keys(state.notes).length > 0 ||
     Object.keys(state.quizAttempts).length > 0 ||
@@ -395,6 +451,9 @@ export function importProgressJson(json: string): { ok: true } | { ok: false; er
   }
   if (!PROGRESS_KEYS.some((key) => key in parsed)) {
     return { ok: false, error: "no progress data found" };
+  }
+  if (!validGuidedImport(parsed.guidedExercises)) {
+    return { ok: false, error: "invalid or unsupported guided exercise data" };
   }
   const migrated = migrateProgress(parsed);
   if (!isClient()) return { ok: true };

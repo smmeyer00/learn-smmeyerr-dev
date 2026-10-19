@@ -43,6 +43,12 @@ test("full storage round trip", async ({ page }) => {
     page.getByRole("status", { name: "" }).filter({ hasText: /Saved locally/ }),
   ).toBeVisible();
 
+  // A guided draft belongs to the same export/import domain.
+  await page.goto("/drills/cache-expiry");
+  await page.getByRole("button", { name: "Start the worksheet" }).click();
+  await page.getByLabel("Normal source demand", { exact: true }).fill("500");
+  await page.goto(CHAPTER);
+
   // 2. Reload: everything persists.
   await page.reload();
   await expect(
@@ -81,6 +87,8 @@ test("full storage round trip", async ({ page }) => {
     "llm-engineering/01-mental-model-of-modern-llms",
   );
 
+  expect(exported.guidedExercises["cache-expiry"].draft.answers["normal-source"]).toBe("500");
+
   // 4. Reset wipes it (two-step confirm).
   await page.getByRole("button", { name: /\[ reset \]/ }).click();
   await page.getByRole("button", { name: /confirm reset/ }).click();
@@ -96,4 +104,6 @@ test("full storage round trip", async ({ page }) => {
   await expect(page.getByText(/start the next chapter/)).toBeVisible();
   await expect(page.getByText("01/21").first()).toBeVisible();
   await expect(page.getByText(/saved · 01/)).toBeVisible();
+  await page.goto("/drills/cache-expiry");
+  await expect(page.getByLabel("Normal source demand", { exact: true })).toHaveValue("500");
 });

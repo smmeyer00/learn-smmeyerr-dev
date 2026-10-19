@@ -1,5 +1,5 @@
 /** Search types and matching with no curriculum imports. */
-export type SearchKind = "chapter" | "glossary" | "drill" | "manual" | "guide";
+export type SearchKind = "chapter" | "glossary" | "drill" | "manual" | "about";
 
 export type SearchEntry = {
   kind: SearchKind;

@@ -1,6 +1,7 @@
 import { courses } from "@/content";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
+import { guidedExerciseSummaries } from "@/content/guided-exercises";
 import {
   ContinueBanner,
   type ChapterTitleEntry,
@@ -35,35 +36,37 @@ export default function Home() {
         <SiteHeader />
 
         <div className="grid gap-12 py-10 sm:py-14 lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-20">
-          <aside className="lg:sticky lg:top-14 lg:self-start">
-            <p className="font-mono text-xs text-primary">index / 001</p>
-            <h1 className="mt-5 text-4xl font-medium tracking-[-0.045em]">
-              courses
-            </h1>
-            <p className="mt-4 max-w-xs text-sm leading-6 text-muted-foreground">
-              Free study paths for working software engineers. Learn a
-              mechanism, work an example, and defend a design.
-            </p>
+          <div className="lg:self-start">
+            <aside className="home-index-sidebar">
+              <p className="font-mono text-xs text-primary">index / 001</p>
+              <h1 className="mt-5 text-4xl font-medium tracking-[-0.045em]">
+                courses
+              </h1>
+              <p className="mt-4 max-w-xs text-sm leading-6 text-muted-foreground">
+                Free study paths for working software engineers. Learn a
+                mechanism, work an example, and defend a design.
+              </p>
 
-            <dl className="mt-9 hidden border-t font-mono text-xs leading-5 lg:block">
-              <div className="grid grid-cols-2 border-b py-2.5">
-                <dt className="text-muted-foreground">format</dt>
-                <dd>self-paced</dd>
-              </div>
-              <div className="grid grid-cols-2 border-b py-2.5">
-                <dt className="text-muted-foreground">progress</dt>
-                <dd>local only</dd>
-              </div>
-              <div className="grid grid-cols-2 border-b py-2.5">
-                <dt className="text-muted-foreground">account</dt>
-                <dd>none</dd>
-              </div>
-            </dl>
-          </aside>
+              <dl className="mt-9 hidden border-t font-mono text-xs leading-5 lg:block">
+                <div className="grid grid-cols-2 border-b py-2.5">
+                  <dt className="text-muted-foreground">format</dt>
+                  <dd>self-paced</dd>
+                </div>
+                <div className="grid grid-cols-2 border-b py-2.5">
+                  <dt className="text-muted-foreground">progress</dt>
+                  <dd>local only</dd>
+                </div>
+                <div className="grid grid-cols-2 border-b py-2.5">
+                  <dt className="text-muted-foreground">account</dt>
+                  <dd>none</dd>
+                </div>
+              </dl>
+            </aside>
+          </div>
 
           <section aria-labelledby="course-index">
             <ContinueBanner chapters={chapterTitles} />
-            <PracticeQueue chapters={chapterTitles} />
+            <PracticeQueue chapters={chapterTitles} guidedExercises={guidedExerciseSummaries} />
             <section aria-labelledby="start-here" className="mb-10">
               <h2
                 id="start-here"
@@ -97,10 +100,10 @@ export default function Home() {
                   Start LLM foundations →
                 </Link>
                 <Link
-                  href="/about-this-course"
+                  href="/about"
                   className="inline-flex min-h-11 items-center text-muted-foreground underline underline-offset-4 hover:text-primary"
                 >
-                  How to study + suggested sequence
+                  About the courses + suggested sequence
                 </Link>
               </div>
             </section>

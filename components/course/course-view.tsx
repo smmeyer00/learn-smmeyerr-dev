@@ -5,6 +5,7 @@ import { ChapterStatus } from "@/components/progress/chapter-status";
 import { CourseSummary } from "@/components/progress/course-summary";
 import { ContinueBanner } from "@/components/progress/continue-banner";
 import { PracticeQueue } from "@/components/progress/practice-queue";
+import { guidedExerciseSummaries } from "@/content/guided-exercises";
 
 function phaseId(phase: string) {
   return phase.toLowerCase().replace(/[^a-z0-9]+/g, "-");
@@ -31,7 +32,7 @@ export function CourseView({ course }: { course: Course }) {
       <div className="mx-auto min-h-svh max-w-6xl px-4 pb-24 sm:px-6">
         <SiteHeader trail={[{ label: course.slug }]} />
         <div className="grid gap-10 py-10 sm:py-14 lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-16">
-          <aside className="lg:sticky lg:top-6 lg:max-h-[calc(100svh-3rem)] lg:self-start lg:overflow-y-auto">
+          <aside className="lg:self-start">
             <p className="font-mono text-xs text-primary">
               {course.id} / course roadmap
             </p>
@@ -92,15 +93,15 @@ export function CourseView({ course }: { course: Course }) {
               </ol>
             </nav>
             <Link
-              href="/about-this-course"
+              href="/about"
               className="mt-4 inline-flex min-h-11 items-center text-sm text-primary underline underline-offset-4"
             >
-              How to use the course →
+              About the courses →
             </Link>
           </aside>
           <section aria-labelledby="chapter-index" className="min-w-0">
             <ContinueBanner chapters={chapters} />
-            <PracticeQueue chapters={chapters} includeDrills={false} />
+            <PracticeQueue chapters={chapters} includeDrills={false} guidedExercises={guidedExerciseSummaries.filter((exercise) => exercise.courseSlug === course.slug)} />
             <div className="border-b pb-5">
               <h2 id="chapter-index" className="font-mono text-xs text-primary">
                 chapter index
@@ -110,6 +111,20 @@ export function CourseView({ course }: { course: Course }) {
                 Time includes assignments, constraint variations, and repeated
                 drills. Reading the notes is one part of that budget.
               </p>
+              <details className="mt-3">
+                <summary className="min-h-11 cursor-pointer text-sm text-primary">
+                  Course project: {course.practiceProject.title}
+                </summary>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  {course.practiceProject.brief}
+                </p>
+                <Link
+                  href={`/${course.slug}/${course.chapters[0].slug}#cumulative-practice`}
+                  className="mt-2 inline-flex min-h-11 items-center text-sm text-primary underline underline-offset-4"
+                >
+                  Start the cumulative project →
+                </Link>
+              </details>
               <details className="mt-3">
                 <summary className="min-h-11 cursor-pointer text-sm text-muted-foreground">
                   What do the depth labels mean?

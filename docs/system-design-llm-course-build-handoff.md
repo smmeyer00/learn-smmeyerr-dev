@@ -14,6 +14,21 @@ sources for all 36 chapters. Study budgets include those activities and
 repeated drills. Planned interaction briefs here remain internal ideas;
 public pages show live labs and usable assignments.
 
+**Teaching-depth supplement (October 2026):** `content/lessons/` expands the
+baseline teaching sections with causal explanations, calculations, and failure
+traces. `content/practice/` adds reference assignment artifacts with explicit
+checks, plus the cumulative Relay and Harbor projects. Each chapter retrieves
+earlier concepts and revises one project document; final chapters integrate the
+packet and review evidence. These activities share the existing practice
+budgets. The baseline below remains the coverage contract; the typed modules
+contain the current expanded teaching text.
+The guided-practice pilot now lives in `content/guided-exercises/`: one
+complete case per course, surfaced at `/drills`. Each follows brief →
+attempt → worked comparison and criterion evidence → revision → targeted
+review. Drafts and reviewed artifacts share the existing versioned progress
+export/import/reset. Original random scenarios remain independent practice;
+additional guided cases wait for review of the two pilots.
+
 ---
 
 ## 1. Executive brief
@@ -79,9 +94,9 @@ Avoid beginner-level explanations of ordinary application-development concepts. 
 - `/course/:track/:chapter` — chapter lesson surface.
 - `/labs` — all interactive labs, filterable by course and concept.
 - `/drills` — randomized interview design deck and timed mock workspace.
-- `/field-manual` — formulas, checklists, tradeoff frames, failure matrices, and print/PDF layout.
+- `/manual` — formulas, checklists, tradeoff frames, failure matrices, and print/PDF layout.
 - `/progress` — mastery heatmap, quiz history, completed drills, and weak areas.
-- `/about-this-course` — goals, intended depth, study method, and update policy.
+- `/about` — goals, intended depth, study method, and update policy.
 
 ### Chapter anatomy
 
@@ -108,7 +123,7 @@ Every chapter should contain these blocks in roughly this order:
 - Chapter completion, quiz state, bookmarks, personal notes, and last visited location.
 - Focus timers for 25-minute study blocks and 50-minute mocks.
 - Random drill and constraint-card generator with reproducible seeds.
-- Print-friendly field manual and chapter summary sheets.
+- Print-friendly manual and chapter summary sheets.
 - Reduced-motion mode and keyboard-accessible interactions.
 - Optional ‘prediction first’ gates in labs: commit a guess, then reveal the simulation.
 - A clear reset/export/import control for local progress; export should be a small JSON file.
@@ -4205,7 +4220,7 @@ Support GPU loss, database failover, cache loss, provider outage, region loss, o
 
 Each drill can draw independent cards for scale, traffic shape, SLO, failure, security/abuse, data residency, and cost. Store the seed so the learner can repeat the exact scenario after 48 hours.
 
-## Field manual
+## Manual
 
 ### Scale formulas
 
@@ -4364,7 +4379,7 @@ Persist only on explicit meaningful events. Debounce notes. Add an export/import
 - Do not encode system health, course track, or quiz correctness by color alone.
 - Respect `prefers-reduced-motion`; replace animated sequences with step controls.
 - At mobile widths, keep lessons, quizzes, and most labs usable; allow dense architecture canvases to use a focused full-screen mode.
-- Print styles should remove navigation and produce clean chapter/field-manual PDFs.
+- Print styles should remove navigation and produce clean chapter/manual PDFs.
 
 ## Performance
 
@@ -4389,7 +4404,7 @@ Persist only on explicit meaningful events. Debounce notes. Add an export/import
 ## Milestone 2 — Full content engine
 
 - Import all 36 chapters as structured MDX/content data.
-- Add chapter navigation, completion, search, bookmarks, notes, print styles, and field manual.
+- Add chapter navigation, completion, search, bookmarks, notes, print styles, and manual.
 - Add content validation so no chapter silently loses quiz/drill/answer metadata.
 
 ## Milestone 3 — High-value labs
@@ -4437,7 +4452,7 @@ The real build is ready when:
 - Progress, quiz attempts, notes, bookmarks, last location, export/import, and migrations work locally.
 - Search finds concepts inside lesson prose, not only chapter titles.
 - The drill deck can generate and reproduce timed scenarios and store self-assessments.
-- The field manual prints cleanly or can be saved as PDF.
+- The manual prints cleanly or can be saved as PDF.
 - Mobile lessons work; dense labs have a deliberate mobile behavior.
 - Reduced motion and text alternatives are implemented.
 - Volatile provider-specific platform content links to current official documentation and carries a review date.

@@ -2,6 +2,64 @@ import { expect, test } from "@playwright/test";
 
 const CHAPTER = "/system-design/04-caching-and-performance";
 
+test("the short home sidebar stays fixed without consuming scroll gestures", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.goto("/");
+  const sidebar = page.locator(".home-index-sidebar");
+  const initialTop = (await sidebar.boundingBox())!.y;
+  for (const x of [200, 900]) {
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.mouse.move(x, 250);
+    await page.mouse.wheel(0, 250);
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(100);
+    expect((await sidebar.boundingBox())!.y).toBe(initialTop);
+    expect(await sidebar.evaluate((element) => element.scrollTop)).toBe(0);
+  }
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  expect((await sidebar.boundingBox())!.y).toBe(initialTop);
+  await page.setViewportSize({ width: 1280, height: 400 });
+  expect(await sidebar.evaluate((element) => getComputedStyle(element).position)).toBe("static");
+});
+
+for (const route of ["/system-design", "/llm-engineering", CHAPTER]) {
+  test(`one document scrolls from either column and the header stays visible: ${route}`, async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 600 });
+    await page.goto(route);
+    const header = page.locator("header");
+    const sidebar = page.locator("main aside").first();
+    const originalTop = await sidebar.evaluate((element) => element.getBoundingClientRect().top);
+    expect(await sidebar.evaluate((element) => getComputedStyle(element).overflowY)).toBe("visible");
+
+    // A wheel over either column moves the document immediately, with no
+    // intermediate sidebar scroll range to consume the gesture.
+    for (const x of [200, 900]) {
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+      await page.mouse.move(x, 250);
+      await page.mouse.wheel(0, 400);
+      await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(250);
+      const scrollY = await page.evaluate(() => window.scrollY);
+      const sidebarTop = await sidebar.evaluate((element) => element.getBoundingClientRect().top);
+      expect(Math.abs(sidebarTop - (originalTop - scrollY))).toBeLessThan(2);
+      await expect(header).toBeInViewport();
+      expect((await header.boundingBox())!.y).toBe(0);
+    }
+
+    const jump = route === CHAPTER
+      ? page.getByRole("navigation", { name: "chapter sections" }).getByRole("link", { name: "lessons", exact: true })
+      : page.getByRole("navigation", { name: "course phases" }).getByRole("link", { name: "Production", exact: true });
+    // LLM phases name this group "Production AI".
+    const target = route === "/llm-engineering"
+      ? page.getByRole("navigation", { name: "course phases" }).getByRole("link", { name: "Production AI", exact: true })
+      : jump;
+    const href = await target.getAttribute("href");
+    await target.click();
+    const section = page.locator(href!);
+    await expect(section).toBeInViewport();
+    expect((await section.boundingBox())!.y).toBeGreaterThanOrEqual((await header.boundingBox())!.height);
+  });
+}
+
 test("the roadmap groups phases and chapter links target real sections", async ({
   page,
 }) => {
@@ -134,10 +192,14 @@ test.describe("touch layouts", () => {
         await page.goto("/");
         await page.locator("header summary").tap();
         const menu = page.getByRole("navigation", { name: "site menu" });
-        for (const name of ["drills", "manual", "glossary", "study guide"])
+        for (const name of ["drills", "manual", "glossary", "about"])
           await expect(
             menu.getByRole("link", { name, exact: true }),
           ).toBeVisible();
+        for (const name of ["manual", "about"])
+          await expect(
+            menu.getByRole("link", { name, exact: true }),
+          ).toHaveAttribute("href", `/${name}`);
         const tapTargets = await menu.getByRole("link").evaluateAll((links) =>
           links.map((link) => {
             const { top, bottom, height } = link.getBoundingClientRect();
@@ -152,15 +214,15 @@ test.describe("touch layouts", () => {
             );
         }
         await menu
-          .getByRole("link", { name: "study guide", exact: true })
+          .getByRole("link", { name: "about", exact: true })
           .tap();
-        await expect(page).toHaveURL("/about-this-course");
+        await expect(page).toHaveURL("/about");
         await page.getByRole("button", { name: /search/ }).click();
         await page
           .getByPlaceholder(/chapters, concepts/)
           .fill("study sequence");
         await expect(
-          page.getByRole("dialog").getByRole("link", { name: /How to study/ }),
+          page.getByRole("dialog").getByRole("link", { name: /About these courses/ }),
         ).toBeVisible();
       },
     );

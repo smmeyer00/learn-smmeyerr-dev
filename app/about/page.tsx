@@ -3,10 +3,10 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 
 export const metadata: Metadata = {
-  title: "How to study | Learn",
+  title: "About | Learn",
   description:
     "Who these free courses are for, a suggested study sequence, practice budgets, and how local progress works.",
-  alternates: { canonical: "/about-this-course" },
+  alternates: { canonical: "/about" },
 };
 
 const sequence = [
@@ -48,10 +48,10 @@ export default function AboutCoursePage() {
   return (
     <main id="main" className="min-h-svh">
       <div className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
-        <SiteHeader trail={[{ label: "study guide" }]} />
+        <SiteHeader trail={[{ label: "about" }]} />
         <div className="mx-auto max-w-3xl py-10 sm:py-14">
           <p className="font-mono text-xs text-primary">
-            start here / study method
+            about / study method
           </p>
           <h1 className="mt-5 text-3xl font-medium tracking-tight sm:text-4xl">
             Make each chapter a practice session.
@@ -97,7 +97,8 @@ export default function AboutCoursePage() {
               </li>
               <li>
                 Produce the assignment artifact, change a constraint, and check
-                it against the rubric.
+                it against the rubric. Then open the sample artifact to compare
+                assumptions, reasoning, and explicit checks; revise the weak part.
               </li>
               <li>
                 Answer the recall questions without notes. Compare reasoning
@@ -106,6 +107,14 @@ export default function AboutCoursePage() {
               <li>
                 Run the interview drill aloud, review the approach afterward,
                 and repeat the weakest part.
+              </li>
+              <li>
+                Keep one cumulative project document per track: Relay for systems,
+                Harbor for LLM engineering. Each chapter asks you to recover
+                earlier ideas before adding a new decision. Preserve your first
+                attempt and revision; the final chapters combine them into a
+                complete design and recorded review. This work uses part of the
+                assignment and recall budget rather than adding another course.
               </li>
             </ol>
             <p className="mt-4 text-sm leading-6 text-muted-foreground">

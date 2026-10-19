@@ -14,7 +14,8 @@ Two courses are included as statically rendered content:
 
 Every chapter renders from structured TypeScript content: outcome and study
 plan → mental model → lessons → worked example → optional live lab →
-assignment and constraint variations → rubric → knowledge checks →
+assignment and constraint variations → rubric and sample artifact → cumulative
+project stage → knowledge checks →
 closed-book recall → interview drill → references and personal notes.
 
 The hours include independent assignments, variations, repeated drills, and
@@ -24,13 +25,33 @@ with a concrete deliverable, a self-review rubric, two recall prompts with
 sample reasoning, and selected primary references. Exercises can be done
 with paper and a text editor; paid model or cloud access is optional.
 
-`/about-this-course` explains prerequisites, the study loop, an alternating
+The lessons include causal explanations, request/failure traces, and worked
+arithmetic. Each assignment has a hidden reference artifact with stated
+assumptions, explicit self-checks, and a common mistake to avoid. Relay (a
+private file service) and Harbor (a support assistant) grow across their
+respective tracks, retrieving earlier concepts before adding new constraints.
+Keep a local project document with first attempts and revisions; cumulative
+work shares the existing assignment/review budget. Final chapters combine
+the artifacts into a design packet and recorded review.
+
+`/about` explains prerequisites, the study loop, an alternating
 sequence across the tracks, local progress, and the source/update policy.
 Course roadmaps group chapters by phase; chapter pages include section links.
 Logged chapter practice joins a review queue on the home page and roadmap:
 scores 1–2 return immediately, stronger practice returns after 48 hours, and
 missed quiz answers prompt review. Completing a chapter points directly to
 the next unfinished chapter in that track.
+
+`/drills` starts with two guided pilots: cache expiry for System Design and
+evidence-backed policy answers for LLM Engineering. Each provides a fixed
+brief, an autosaved worksheet, optional hints, calculation checks, a worked
+reference, anchored self-review criteria with evidence, and a saved revision.
+The original attempt stays alongside the revision; repeating a case keeps
+reviewed history and starts a blank worksheet. Recorded gaps return for the
+next session; a baseline meeting all checks returns after 48 hours. Guided
+work is included in progress export/import/reset. The original random deck,
+oral fluency prompts, and interview redo queue remain under independent
+practice. Additional guided cases wait for review of these two pilots.
 
 Outstanding work is tracked in [`TODO.md`](./TODO.md); parked ideas live
 in [`docs/ROADMAP.md`](./docs/ROADMAP.md). If you are an agent starting a
@@ -52,18 +73,19 @@ new session, read [`AGENTS.md`](./AGENTS.md) first.
 app/
   page.tsx                  # course index (/)
   layout.tsx                # root layout, dark theme, metadata, search index
-  about-this-course/page.tsx # audience, study sequence, budgets, local data
+  about/page.tsx # audience, study sequence, budgets, local data
   not-found.tsx             # branded 404 with course/search recovery
   opengraph-image.tsx        # static social preview generated at build time
   glossary/page.tsx         # glossary reference
-  drills/page.tsx           # interview drill deck
+  drills/page.tsx           # guided pilots + optional independent drill deck
+  drills/[exercise]/page.tsx # statically generated guided worksheets
   mock/page.tsx             # 50-minute mock workspace
-  field-manual/page.tsx     # field manual reference
+  manual/page.tsx     # manual reference
   [course]/page.tsx         # course chapter index
   [course]/[chapter]/page.tsx  # chapter lesson surface
 components/
   course/                   # course-view, chapter-view (block renderers)
-  drills/                   # deck, mock workspace (client)
+  drills/                   # guided worksheets, independent deck, mock (client)
   labs/                     # lab-shell, registry, code-split host + 10 labs
   progress/                 # completion, quiz, notes, bookmarks islands
   search/                   # command palette (client)
@@ -73,14 +95,18 @@ content/
   types.ts                  # Course / Chapter schema
   system-design.ts          # course content (15 chapters)
   llm-engineering.ts        # course content (21 chapters)
+  lessons/                  # expanded teaching sections for all 36 chapters
   study-guides/             # 36 worked examples, assignments, rubrics, recall
+  practice/                 # sample artifacts + cumulative project stages
   references.ts             # selected primary sources with review months
   drills.ts                 # 20 scenarios, constraint decks, mock structure
-  field-manual.ts           # formulas, budgets, metrics, checklist, FACT
+  guided-exercises/         # two complete guided cases + content schema
+  manual.ts           # formulas, budgets, metrics, checklist, FACT
   glossary.ts               # durable concepts with chapter deep links
   index.ts                  # registry + lookup helpers
 lib/
   progress.ts               # versioned localStorage store + actions
+  guided-practice.ts        # draft validation, arithmetic checks, review rules
   search.ts                 # build-time search index
   search-matching.ts        # browser matcher, isolated from curriculum imports
   study.ts                  # next unfinished chapter + chapter review queue

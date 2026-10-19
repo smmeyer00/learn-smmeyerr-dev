@@ -8,9 +8,10 @@
 import { courses, getChapterReferences } from "../content/index";
 import { labsForChapter } from "../components/labs/registry";
 import { drillScenarios, constraintDecks } from "../content/drills";
-import { fieldManual } from "../content/field-manual";
+import { manual } from "../content/manual";
 import { glossary } from "../content/glossary";
 import { buildSearchIndex } from "../lib/search";
+import { guidedExercises } from "../content/guided-exercises";
 
 let failures = 0;
 
@@ -29,6 +30,11 @@ for (const course of courses) {
   check(!courseSlugs.has(course.slug), `duplicate course slug ${course.slug}`);
   courseSlugs.add(course.slug);
   check(course.chapters.length > 0, `${course.slug}: no chapters`);
+  check(
+    course.practiceProject.title.trim().length > 0 &&
+      course.practiceProject.brief.trim().length > 0,
+    `${course.slug}: missing cumulative project brief`,
+  );
 
   const slugs = new Set<string>();
   let hours = 0;
@@ -50,8 +56,9 @@ for (const course of courses) {
     for (const lesson of chapter.lessons) {
       check(lesson.title.length > 0, `${where}: lesson with empty title`);
       check(
-        lesson.paragraphs.length > 0,
-        `${where}: lesson "${lesson.title}" has no paragraphs`,
+        lesson.paragraphs.length >= 3 &&
+          lesson.paragraphs.every((paragraph) => paragraph.trim().length > 0),
+        `${where}: lesson "${lesson.title}" needs a summary and substantive explanations`,
       );
     }
     check(
@@ -134,6 +141,35 @@ for (const course of courses) {
         `${where}: incomplete recall checks`,
       );
       check(guide.references.length > 0, `${where}: missing primary sources`);
+      const sample = guide.sampleSolution;
+      check(
+        !!sample &&
+          [sample.assumptions, sample.artifact, sample.explanation, sample.pitfall]
+            .every((value) => value.trim().length > 0) &&
+          sample.checks.length >= 3 &&
+          sample.checks.every((value) => value.trim().length > 0),
+        `${where}: missing sample artifact, reasoning, checks, or misconception`,
+      );
+      const cumulative = guide.cumulativePractice;
+      check(
+        !!cumulative &&
+          [cumulative.deliverable, cumulative.prompt, cumulative.sampleAnswer]
+            .every((value) => value.trim().length > 0),
+        `${where}: incomplete cumulative practice`,
+      );
+      if (cumulative) {
+        check(
+          new Set(cumulative.revisit).size === cumulative.revisit.length &&
+            cumulative.revisit.every((order) =>
+              Number.isInteger(order) && order > 0 && order < chapter.order &&
+              course.chapters.some((earlier) => earlier.order === order)),
+          `${where}: cumulative practice must link only to unique earlier chapters`,
+        );
+        check(
+          chapter.order === 1 || cumulative.revisit.length > 0,
+          `${where}: cumulative practice must retrieve earlier material`,
+        );
+      }
     }
     for (const ref of guide
       ? getChapterReferences(chapter)
@@ -212,6 +248,35 @@ check(glossary.length >= 40, `glossary has ${glossary.length} terms (< 40)`);
 const chapterKeys = new Set(
   courses.flatMap((c) => c.chapters.map((ch) => `${c.slug}/${ch.slug}`)),
 );
+console.log("validating guided exercises…");
+check(guidedExercises.length === 2, "expected the two guided pilot exercises");
+check(new Set(guidedExercises.map((exercise) => exercise.id)).size === guidedExercises.length, "duplicate guided exercise ids");
+check(new Set(guidedExercises.map((exercise) => exercise.courseSlug)).size === 2, "guided pilots must cover both courses");
+for (const exercise of guidedExercises) {
+  const where = "guided/" + exercise.id;
+  const fields = new Set(exercise.fields.map((field) => field.id));
+  check(/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(exercise.id), where + ": invalid route id");
+  check(exercise.version === 1 && exercise.minutes > 0, where + ": invalid version or budget");
+  check(fields.size === exercise.fields.length && fields.size >= 4, where + ": duplicate or missing worksheet fields");
+  check(exercise.brief.length >= 2 && exercise.givens.length >= 4 && exercise.deliverable.trim().length > 0, where + ": incomplete brief");
+  check(exercise.prerequisites.length > 0, where + ": missing preparation");
+  for (const link of [...exercise.prerequisites, exercise.next, ...exercise.rubric.map((criterion) => criterion.remediation)]) {
+    check(chapterKeys.has(link.href.split("#")[0].slice(1)), where + ": unknown chapter link " + link.href);
+  }
+  for (const field of exercise.fields) {
+    check([field.label, field.prompt, field.hint, field.reference].every((text) => text.trim().length > 0), where + ": incomplete field " + field.id);
+    check(field.kind === "number" ? !!field.check && !!field.unit : !field.check, where + ": invalid numeric check " + field.id);
+    if (field.check) check(Number.isFinite(field.check.expected) && Number.isFinite(field.check.tolerance) && field.check.tolerance >= 0 && !!field.check.explanation, where + ": invalid calculation " + field.id);
+  }
+  check(exercise.reference.steps.length >= 3 && !!exercise.reference.artifact && exercise.reference.alternatives.length > 0 &&
+    Object.values(exercise.reference.weakAnswer).every((text) => text.trim().length > 0), where + ": incomplete worked comparison");
+  check(exercise.rubric.length >= 3 && new Set(exercise.rubric.map((criterion) => criterion.id)).size === exercise.rubric.length, where + ": incomplete rubric");
+  for (const criterion of exercise.rubric) {
+    check(criterion.fields.length > 0 && criterion.fields.every((id) => fields.has(id)), where + ": unknown rubric field");
+    check(Object.values(criterion.levels).every((text) => text.trim().length > 0) && !!criterion.remediation.task, where + ": missing anchored levels or repair");
+  }
+  check(!!exercise.transfer.prompt && !!exercise.transfer.reasoning && exercise.references.length > 0, where + ": missing next-practice reasoning or sources");
+}
 for (const term of glossary) {
   check(
     term.definition.length > 20,
@@ -225,8 +290,8 @@ for (const term of glossary) {
   }
 }
 check(
-  fieldManual.length === 5,
-  `field manual has ${fieldManual.length} sections (!== 5)`,
+  manual.length === 5,
+  `manual has ${manual.length} sections (!== 5)`,
 );
 
 console.log("validating search index…");

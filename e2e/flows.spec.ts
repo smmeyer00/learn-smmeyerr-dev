@@ -34,6 +34,47 @@ test("chapter renders the full learning loop", async ({ page }) => {
   }
 });
 
+for (const entry of [
+  {
+    route: "/system-design/04-caching-and-performance",
+    project: "Relay",
+    artifact: "1,000 source reads/s",
+    earlier: "/system-design/01-system-design-foundations#lessons",
+  },
+  {
+    route: "/llm-engineering/04-inference-and-serving",
+    project: "Harbor",
+    artifact: "1,073,741,824 bytes",
+    earlier: "/llm-engineering/01-mental-model-of-modern-llms#lessons",
+  },
+]) {
+  test(`${entry.project} reference artifacts reveal on request and cumulative links revisit earlier teaching`, async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto(entry.route);
+    const assignment = page.locator("#assignment");
+    const artifact = assignment.locator("pre");
+    await expect(artifact).toBeHidden();
+    await assignment.getByText("Compare a sample artifact after your attempt", { exact: true }).click();
+    await expect(artifact).toBeVisible();
+    await expect(assignment).toContainText(entry.artifact);
+    await expect(assignment.getByRole("heading", { name: "Check your artifact" })).toBeVisible();
+
+    const cumulative = page.locator("#cumulative-practice");
+    await expect(cumulative.getByRole("heading", { name: new RegExp(entry.project) })).toBeVisible();
+    const comparison = cumulative.locator("details").filter({ hasText: "Compare cumulative reasoning after your attempt" });
+    await expect(comparison.locator("p")).toBeHidden();
+    await comparison.locator("summary").click();
+    await expect(comparison.locator("p")).toBeVisible();
+    const noOverflow = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
+    expect(noOverflow).toBe(true);
+    const revisit = cumulative.getByRole("navigation", { name: "revisit earlier concepts" }).locator(`a[href="${entry.earlier}"]`);
+    await expect(revisit).toBeVisible();
+    await revisit.click();
+    await expect(page).toHaveURL(entry.earlier);
+    await expect(page.locator("#lessons")).toBeVisible();
+  });
+}
+
 test("mark-complete persists across reload", async ({ page }) => {
   await page.goto("/llm-engineering/01-mental-model-of-modern-llms");
   const toggle = page.getByRole("button", {
@@ -149,6 +190,7 @@ test("redo queue surfaces weak scenarios and weak mocks", async ({ page }) => {
     { now, hour },
   );
   await page.goto("/drills");
+  await page.getByText("Independent interview practice · scenario deck, redo queue, and oral fluency", { exact: true }).click();
   await expect(page.getByText("redo — scored weak").first()).toBeVisible();
   await expect(
     page.getByRole("link", { name: /public ai api/i }),
@@ -157,6 +199,7 @@ test("redo queue surfaces weak scenarios and weak mocks", async ({ page }) => {
 
 test("drill deck draw is reproducible", async ({ page }) => {
   await page.goto("/drills");
+  await page.getByText("Independent interview practice · scenario deck, redo queue, and oral fluency", { exact: true }).click();
   await page.getByRole("button", { name: /draw scenario/i }).click();
   const first = await page
     .getByText(/seed \d+/)

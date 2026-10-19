@@ -5,16 +5,16 @@ export type TrailItem = { label: string; href?: string };
 
 const destinations = [
   { href: "/drills", label: "drills" },
-  { href: "/field-manual", label: "manual" },
+  { href: "/manual", label: "manual" },
   { href: "/glossary", label: "glossary" },
-  { href: "/about-this-course", label: "study guide" },
+  { href: "/about", label: "about" },
 ];
 const linkClass =
   "inline-flex min-h-11 items-center text-muted-foreground underline decoration-border underline-offset-4 transition-colors hover:text-primary";
 
 export function SiteHeader({ trail = [] }: { trail?: TrailItem[] }) {
   return (
-    <header className="relative flex min-h-16 items-center justify-between gap-2 border-b py-2 font-mono text-xs">
+    <header className="sticky top-0 z-40 flex min-h-16 items-center justify-between gap-2 border-b bg-background py-2 font-mono text-xs">
       <p className="min-w-0 truncate font-medium">
         <Link
           href="/"

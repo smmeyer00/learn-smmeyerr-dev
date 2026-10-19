@@ -9,7 +9,7 @@ uncommitted for review.
 Run `pnpm dev` and visit:
 
 - `/` — audience, entry points, next unfinished chapter, and practice to revisit
-- `/about-this-course` — prerequisites, learning method, sequence, time budgets,
+- `/about` — prerequisites, learning method, sequence, time budgets,
   progress portability, and update policy
 - `/system-design` or `/llm-engineering` — phase groups, phase navigation,
   progress, and practice time

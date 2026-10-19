@@ -1,3 +1,4 @@
+import { systemDesignLessons } from "./lessons/system-design";
 import type { Course } from "./types";
 import { systemDesignStudyGuides } from "./study-guides/system-design";
 
@@ -8,6 +9,10 @@ export const systemDesign: Course = {
   description:
     "Build senior-level design judgment, then pressure-test it on AI-native infrastructure.",
   scope: "15 chapters · ~56 hours of practice",
+  practiceProject: {
+    title: "Relay · build and evolve a private file service",
+    brief: "Keep one design document for Relay, a tenant-aware file service. Start with 100k daily users, ten downloads per user/day, 10k uploads/day, 1 MB typical bodies, 30-day retention, and a 5× download peak. Files are private to workspaces. Treat these as fictional planning assumptions. Later chapters add previews, recovery, regional constraints, compute, and an assistant. Record each change rather than replacing the earlier version; the final review combines the whole packet. These activities share the chapter's existing practice budget.",
+  },
   phaseOrder: [
     "Foundations",
     "Distributed core",
@@ -43,41 +48,7 @@ export const systemDesign: Course = {
           { label: "Stress", detail: "Bottlenecks + failure" },
         ],
       },
-      lessons: [
-        {
-          title: "Start with the contract",
-          paragraphs: [
-            "Ask questions that change architecture: who uses it, what the critical read/write path is, whether data loss is acceptable, and what success looks like. State assumptions when the interviewer will not choose for you.",
-          ],
-          bullets: [
-            "Functional: verbs the system must support",
-            "Non-functional: measurable quality constraints",
-            "Out of scope: complexity you deliberately defer",
-          ],
-        },
-        {
-          title: "Estimate to choose—not to perform arithmetic",
-          paragraphs: [
-            "Use round numbers and show units. An estimate matters when it changes a decision: one database or shards, synchronous work or a queue, memory cache or disk, one region or several.",
-          ],
-          bullets: [
-            "Average RPS = daily actions / 86,400",
-            "Peak is commonly 2–10× average; explain your factor",
-            "Storage/year = writes/sec × bytes/write × seconds/year × replication",
-          ],
-        },
-        {
-          title: "Architecture is a chain of responsibilities",
-          paragraphs: [
-            "Every box should own something and every arrow should carry a named request or event. Begin with the critical path, then add components only to satisfy a requirement or repair a bottleneck.",
-          ],
-          bullets: [
-            "Name data and control flows",
-            "Mark stateful boundaries",
-            "Identify one bottleneck before proposing scale mechanisms",
-          ],
-        },
-      ],
+      lessons: systemDesignLessons[1],
       seniorSignal:
         "Say: “I’m estimating because this determines whether a single relational primary is plausible.” Tie every number and component to a decision.",
       pitfalls: [
@@ -152,41 +123,7 @@ export const systemDesign: Course = {
           { label: "Dependency", detail: "Store or compute" },
         ],
       },
-      lessons: [
-        {
-          title: "Protocol follows conversation shape",
-          paragraphs: [
-            "REST is excellent for public resource APIs. gRPC fits typed internal request/response and streaming. SSE is simple server-to-client streaming over HTTP. WebSockets fit bidirectional, long-lived interaction. HTTP/2 reduces connection pressure; HTTP/3 improves behavior under packet loss.",
-          ],
-          bullets: [
-            "Prefer the least stateful protocol that meets the need",
-            "Streaming changes cancellation, backpressure, and observability",
-            "Connection reuse matters before protocol trivia",
-          ],
-        },
-        {
-          title: "Retries are load amplifiers",
-          paragraphs: [
-            "A timeout does not prove failure; it proves the caller stopped waiting. Retrying a non-idempotent operation can duplicate side effects. Bound retries, add jitter, propagate deadlines, and use idempotency keys at the effect boundary.",
-          ],
-          bullets: [
-            "Retry transient failures, not every 4xx",
-            "Budget attempts inside the user deadline",
-            "Deduplicate at the component that commits the effect",
-          ],
-        },
-        {
-          title: "Boundaries are organizational and operational",
-          paragraphs: [
-            "Split when a domain needs independent ownership, scaling, security, or release cadence. Each synchronous hop increases latency and correlated-failure surface, so keep the critical path short.",
-          ],
-          bullets: [
-            "High cohesion inside, low coupling across",
-            "Prefer stable contracts over shared tables",
-            "Do not begin with microservices as a status symbol",
-          ],
-        },
-      ],
+      lessons: systemDesignLessons[2],
       seniorSignal:
         "Discuss deadline propagation and retry ownership. “Three layers each retrying three times can turn one request into 27 downstream attempts.”",
       pitfalls: [
@@ -257,41 +194,7 @@ export const systemDesign: Course = {
           { label: "Distribution", detail: "Partition + replicate" },
         ],
       },
-      lessons: [
-        {
-          title: "Model the invariants first",
-          paragraphs: [
-            "List entities, relationships, uniqueness constraints, and state transitions. If money, ownership, or inventory must change atomically, relational transactions are a powerful default. Denormalize only for a measured access pattern.",
-          ],
-          bullets: [
-            "Indexes accelerate reads but tax writes and storage",
-            "Isolation controls anomalies, not just speed",
-            "Joins are useful; cross-shard joins are the warning",
-          ],
-        },
-        {
-          title: "Partition keys encode your future",
-          paragraphs: [
-            "A good key spreads throughput and co-locates common operations. Hash keys balance load but weaken range scans. Range keys help scans but invite hotspots. Hybrid keys—tenant plus time bucket, for example—often balance both.",
-          ],
-          bullets: [
-            "Estimate hottest key, not only average key",
-            "Plan rebalancing and key evolution",
-            "Avoid unbounded partitions",
-          ],
-        },
-        {
-          title: "Replication is a consistency decision",
-          paragraphs: [
-            "Leader/follower simplifies ordered writes but creates lag. Multi-leader improves regional write availability while creating conflicts. Leaderless systems trade coordination for quorum math and repair. State the read guarantee users need.",
-          ],
-          bullets: [
-            "Read-your-writes can be session scoped",
-            "Eventual consistency is incomplete without convergence behavior",
-            "Use outbox + idempotent consumer to connect DB state and events",
-          ],
-        },
-      ],
+      lessons: systemDesignLessons[3],
       seniorSignal:
         "Name the invariant you are protecting: “Username uniqueness needs serialized ownership; feed fan-out can be eventually consistent.”",
       pitfalls: [
@@ -362,41 +265,7 @@ export const systemDesign: Course = {
           { label: "Fill", detail: "TTL + version" },
         ],
       },
-      lessons: [
-        {
-          title: "A cache is a prediction",
-          paragraphs: [
-            "You predict that the same result will be needed again before it becomes invalid. Estimate working-set size and hit rate. A 95% hit rate can reduce source load 20×; a 50% hit rate often does not justify major complexity.",
-          ],
-          bullets: [
-            "Key includes every input that changes output",
-            "Capacity targets the hot working set, not the full corpus",
-            "Negative caching prevents repeated misses",
-          ],
-        },
-        {
-          title: "Invalidation is product semantics",
-          paragraphs: [
-            "Ask how stale is acceptable. TTL gives bounded staleness and simple failure behavior. Event invalidation is fresher but can lose or reorder events. Versioned keys make old values unreachable and simplify rollouts.",
-          ],
-          bullets: [
-            "Use jittered TTLs to avoid synchronized expiry",
-            "Single-flight/coalescing suppresses stampedes",
-            "Serve stale during source trouble only when semantics allow",
-          ],
-        },
-        {
-          title: "Performance is broader than caching",
-          paragraphs: [
-            "Batch network calls, paginate unbounded results, compress large payloads, precompute expensive aggregates, and pool connections. Optimize the bottleneck you can name and measure.",
-          ],
-          bullets: [
-            "Batching trades latency for throughput",
-            "Precompute trades write/storage cost for read latency",
-            "Connection pools need queue and timeout bounds",
-          ],
-        },
-      ],
+      lessons: systemDesignLessons[4],
       seniorSignal:
         "When adding cache, give the failure plan: “If Redis is unavailable, cap source concurrency and degrade; never let every miss stampede the primary.”",
       pitfalls: [
@@ -468,41 +337,7 @@ export const systemDesign: Course = {
           { label: "Record", detail: "Outcome + retry" },
         ],
       },
-      lessons: [
-        {
-          title: "Choose by semantics",
-          paragraphs: [
-            "A queue gives one worker ownership of a task. A log retains ordered partition history so multiple consumer groups can independently replay it. Kafka ordering is per partition—not global—so partition by the entity whose events must stay ordered.",
-          ],
-          bullets: [
-            "Events describe facts; commands request actions",
-            "Offsets are consumer progress, not business completion",
-            "Retention enables replay and new consumers",
-          ],
-        },
-        {
-          title: "At-least-once is the practical default",
-          paragraphs: [
-            "A worker can finish the side effect and crash before acknowledgment, so redelivery happens. Make handlers idempotent with a stable operation key, transactional state transition, or effect ledger.",
-          ],
-          bullets: [
-            "Exactly-once claims have a system boundary",
-            "Retries need exponential backoff and jitter",
-            "Dead-letter queues need an owner and replay procedure",
-          ],
-        },
-        {
-          title: "Backpressure is part of the API",
-          paragraphs: [
-            "When arrival exceeds service rate, queues grow and latency becomes unbounded. Bound the queue, reject or defer low-priority work, shed optional load, and expose truthful status.",
-          ],
-          bullets: [
-            "Track queue age, not only depth",
-            "Reserve capacity for high-priority tenants",
-            "Admission control belongs before scarce work",
-          ],
-        },
-      ],
+      lessons: systemDesignLessons[5],
       seniorSignal:
         "State the ordering unit and duplicate boundary. Those two sentences distinguish an operational design from boxes-and-arrows.",
       pitfalls: [
@@ -578,41 +413,7 @@ export const systemDesign: Course = {
           { label: "Apply", detail: "State converges" },
         ],
       },
-      lessons: [
-        {
-          title: "Partial failure creates uncertainty",
-          paragraphs: [
-            "If a request times out, the remote node may be down, the network may be slow, the response may be lost, or the operation may have committed. APIs need stable IDs and retriable semantics because certainty is unavailable.",
-          ],
-          bullets: [
-            "Use monotonic clocks for elapsed time",
-            "Leases expire; stale holders need fencing tokens",
-            "Health checks are observations, not truth",
-          ],
-        },
-        {
-          title: "CAP is a partition-time statement",
-          paragraphs: [
-            "When communication between replicas is partitioned, a given operation cannot both always respond and remain linearizable. Systems make different choices by operation; outside partitions, latency/consistency tradeoffs still exist under PACELC.",
-          ],
-          bullets: [
-            "Replication alone does not create availability",
-            "Quorum intersection can preserve a single history",
-            "Eventual consistency needs conflict and convergence rules",
-          ],
-        },
-        {
-          title: "Coordinate only what must agree",
-          paragraphs: [
-            "Consensus maintains a fault-tolerant ordered log. It is useful for metadata, membership, and ownership but expensive in every data operation. Scale by partitioning ownership and making operations idempotent or commutative.",
-          ],
-          bullets: [
-            "Majority tolerates minority failure",
-            "Leader election does not prevent stale actors by itself",
-            "Exactly-once is usually deduplication plus transactions within a boundary",
-          ],
-        },
-      ],
+      lessons: systemDesignLessons[6],
       seniorSignal:
         "Use uncertainty language: “After timeout the outcome is unknown, so the client retries with the same operation ID and reads status.”",
       pitfalls: [
@@ -689,41 +490,7 @@ export const systemDesign: Course = {
           { label: "Recover", detail: "Failover + restore" },
         ],
       },
-      lessons: [
-        {
-          title: "An SLO is a product promise",
-          paragraphs: [
-            "99.9% allows about 43.8 minutes of downtime per 30-day month; 99.99% about 4.38 minutes. Multiplying serial dependency availability reveals why every synchronous hop spends budget.",
-          ],
-          bullets: [
-            "Measure the user journey, not server uptime",
-            "Error budgets govern release vs reliability work",
-            "Tail latency can violate an SLO before total outage",
-          ],
-        },
-        {
-          title: "Redundancy must cross failure domains",
-          paragraphs: [
-            "Two replicas on one host do not protect against host loss; two AZs may not meet a three-AZ quorum strategy. Active-active improves recovery but adds state and conflict complexity.",
-          ],
-          bullets: [
-            "Failover detection can be riskier than failover mechanics",
-            "Exercise backups by restoring them",
-            "Know RPO (data) and RTO (time)",
-          ],
-        },
-        {
-          title: "Stop failure from spreading",
-          paragraphs: [
-            "Bound every call with a timeout and concurrency limit. Circuit breakers stop futile work. Bulkheads reserve resources. Jitter avoids synchronized retry waves. Graceful degradation preserves the critical product path.",
-          ],
-          bullets: [
-            "Caller deadline should shrink downstream",
-            "Shed cheap and early",
-            "Prefer static/history over total failure when safe",
-          ],
-        },
-      ],
+      lessons: systemDesignLessons[7],
       seniorSignal:
         "Quantify the error budget and show the degradation ladder: full answer → smaller model → cached answer → queued job → explicit failure.",
       pitfalls: [
@@ -795,41 +562,7 @@ export const systemDesign: Course = {
           { label: "Learn", detail: "Postmortem + fix" },
         ],
       },
-      lessons: [
-        {
-          title: "Measure from both directions",
-          paragraphs: [
-            "RED—rate, errors, duration—describes request-serving behavior. USE—utilization, saturation, errors—describes resources. Together they connect a user symptom like p99 latency to a cause like GPU queue saturation.",
-          ],
-          bullets: [
-            "Prefer histogram percentiles over averages",
-            "Control high-cardinality labels",
-            "Define SLI exactly at the user boundary",
-          ],
-        },
-        {
-          title: "Reconstruct one request",
-          paragraphs: [
-            "Propagate a correlation or trace ID through services and asynchronous work. Structured logs make fields queryable; traces preserve causality. Sample intelligently and never log secrets or raw sensitive prompts by default.",
-          ],
-          bullets: [
-            "Carry context in message headers",
-            "Record retry attempt and idempotency key",
-            "Link model, prompt, tool, cost, and outcome",
-          ],
-        },
-        {
-          title: "Rollouts are experiments with brakes",
-          paragraphs: [
-            "Canaries expose a small traffic slice, feature flags separate release from deployment, and blue-green gives fast environment rollback. Define health gates and automatic halt conditions before rollout.",
-          ],
-          bullets: [
-            "Alert on user symptoms and SLO burn",
-            "Postmortems improve systems, not blame people",
-            "Capacity plans need lead time for scarce resources",
-          ],
-        },
-      ],
+      lessons: systemDesignLessons[8],
       seniorSignal:
         "For AI systems, correlate request ID, model/prompt version, retrieved documents, tool calls, token usage, latency stages, safety result, and user outcome—with privacy controls.",
       pitfalls: [
@@ -906,41 +639,7 @@ export const systemDesign: Course = {
           { label: "Audit", detail: "What happened?" },
         ],
       },
-      lessons: [
-        {
-          title: "Draw trust boundaries",
-          paragraphs: [
-            "Mark browser, edge, application, tool sandbox, data plane, and external systems. Identify assets and attacker goals. Authentication establishes identity; authorization must still run at every protected resource boundary.",
-          ],
-          bullets: [
-            "Short-lived, scoped credentials limit blast radius",
-            "JWT validation includes signature, issuer, audience, and expiry",
-            "OAuth delegates access; it is not authorization policy by itself",
-          ],
-        },
-        {
-          title: "Multi-tenancy is a data-flow property",
-          paragraphs: [
-            "Carry tenant identity from authenticated request through cache keys, queries, events, object paths, logs, and tools. Enforce policy server-side. High-risk workloads may need physical isolation beyond row filters.",
-          ],
-          bullets: [
-            "Default-deny resource access",
-            "Avoid confused-deputy tool calls",
-            "Partition quotas and concurrency per tenant",
-          ],
-        },
-        {
-          title: "Abuse is reliability plus economics",
-          paragraphs: [
-            "Layer cheap controls before expensive work: input limits, identity reputation, token buckets, anomaly detection, and spend caps. Preserve headroom for trusted traffic and record appeal/recovery paths for false positives.",
-          ],
-          bullets: [
-            "Rate-limit by user, tenant, IP, and credential as appropriate",
-            "Audit policy changes and privileged actions",
-            "Minimize and expire sensitive data",
-          ],
-        },
-      ],
+      lessons: systemDesignLessons[9],
       seniorSignal:
         "Walk one threat end-to-end: stolen API key → distributed requests → expensive inference. Show detection, budget reservation, cutoff, audit, and credential rotation.",
       pitfalls: [
@@ -1017,41 +716,7 @@ export const systemDesign: Course = {
           { label: "Evacuate", detail: "Capacity + replay" },
         ],
       },
-      lessons: [
-        {
-          title: "Choose a write topology per domain",
-          paragraphs: [
-            "A home-region model gives a single authority and simple conflict behavior at the cost of remote write latency. Multi-leader improves local writes but forces merge semantics. Some data—preferences—merges naturally; other data—unique ownership—does not.",
-          ],
-          bullets: [
-            "Read replicas reduce latency but expose lag",
-            "Session routing can preserve read-your-writes",
-            "Keep control plane failure separate from data plane",
-          ],
-        },
-        {
-          title: "Residency constrains architecture",
-          paragraphs: [
-            "Data residency can dictate storage and processing location, backup geography, and operator access. Make the policy explicit before global replication.",
-          ],
-          bullets: [
-            "Classify data before placing it",
-            "Keep region-independent identifiers",
-            "Know which dependencies are actually regional",
-          ],
-        },
-        {
-          title: "Evacuation is a capacity event",
-          paragraphs: [
-            "Failover succeeds only if the destination has capacity, credentials, data, configuration, and tested runbooks. DNS/edge routing is the smallest part. Plan write fencing, backlog replay, and failback.",
-          ],
-          bullets: [
-            "Measure replication lag",
-            "Exercise partial and full-region loss",
-            "Prevent two regions from believing they are sole writer",
-          ],
-        },
-      ],
+      lessons: systemDesignLessons[10],
       seniorSignal:
         "Frame global design as a product choice: “Conversation reads may tolerate seconds of lag; billing ledger ownership remains single-writer.”",
       pitfalls: [
@@ -1128,41 +793,7 @@ export const systemDesign: Course = {
           { label: "Run", detail: "Observe + preempt" },
         ],
       },
-      lessons: [
-        {
-          title: "Workload shape determines the pool",
-          paragraphs: [
-            "Online inference values low queue time and predictable latency. Batch training or embeddings can wait, fill troughs, and tolerate preemption. Separate pools or reservations prevent batch work from consuming interactive headroom.",
-          ],
-          bullets: [
-            "Stateless frontends scale cheaply",
-            "Stateful workers need checkpoint and ownership semantics",
-            "Autoscaling lag makes admission control essential",
-          ],
-        },
-        {
-          title: "The bottleneck moves",
-          paragraphs: [
-            "A service may be GPU-compute bound during decode, memory-capacity bound by KV caches, CPU-bound during tokenization, or network-bound during distributed collectives. Measure per stage.",
-          ],
-          bullets: [
-            "Bin-pack without fragmenting scarce accelerator shapes",
-            "Data/model locality reduces transfer cost",
-            "Queue age exposes insufficient service rate",
-          ],
-        },
-        {
-          title: "Fairness is explicit policy",
-          paragraphs: [
-            "FIFO can let one huge request block many small ones. Fair-share scheduling, tenant weights, size classes, and concurrency caps make service predictable. Cost-aware routing may choose a smaller model or batch path.",
-          ],
-          bullets: [
-            "Reserve capacity for critical traffic",
-            "Preemption requires checkpoint or restart policy",
-            "Charge/attribute shared resource cost",
-          ],
-        },
-      ],
+      lessons: systemDesignLessons[11],
       seniorSignal:
         "Name the scheduling objective and its victim: maximizing GPU utilization can worsen interactive p99; reserve latency headroom deliberately.",
       pitfalls: [
@@ -1238,41 +869,7 @@ export const systemDesign: Course = {
           { label: "Evaluate", detail: "Outcome + trace" },
         ],
       },
-      lessons: [
-        {
-          title: "Separate planes and stages",
-          paragraphs: [
-            "The edge authenticates and reserves quota; orchestration assembles context and policy; the model gateway routes; inference workers batch and stream; tool runners execute behind isolation; telemetry and eval pipelines learn from outcomes.",
-          ],
-          bullets: [
-            "Track time-to-first-token separately from total time",
-            "Cancel work when the client disconnects",
-            "Keep authorization attached to retrieved context and tools",
-          ],
-        },
-        {
-          title: "Optimize tokens as the core resource",
-          paragraphs: [
-            "Input tokens consume prefill compute and KV memory; output tokens consume sequential decode time. Prefix caching, continuous batching, smaller context, and model routing change both latency and cost.",
-          ],
-          bullets: [
-            "Batch compatible work without excessive waiting",
-            "Budget context among instructions, history, retrieval, and tool results",
-            "Cache only when privacy and semantic equivalence are clear",
-          ],
-        },
-        {
-          title: "Bound probabilistic behavior",
-          paragraphs: [
-            "Wrap model decisions in deterministic checks: schemas, policies, permission gates, time/cost budgets, loop detection, and idempotent tools. Evals test end-to-end outcomes, not only prose quality.",
-          ],
-          bullets: [
-            "Fallback quality change must be product-visible when material",
-            "Moderation has input/output/tool surfaces",
-            "Telemetry needs model and prompt versions",
-          ],
-        },
-      ],
+      lessons: systemDesignLessons[12],
       seniorSignal:
         "Always draw the non-model control loop: authenticate → reserve budget → retrieve with ACLs → invoke → validate → act with least privilege → evaluate.",
       pitfalls: [
@@ -1348,41 +945,7 @@ export const systemDesign: Course = {
           { label: "Stress", detail: "Failure + abuse" },
         ],
       },
-      lessons: [
-        {
-          title: "Map prompts to dominant difficulty",
-          paragraphs: [
-            "Feeds are fan-out and ranking. Chat is ordered low-latency delivery plus offline sync. File storage is metadata plus immutable blobs. Autocomplete is prefix retrieval under a tight latency budget. Payments are ledgers and idempotent state transitions.",
-          ],
-          bullets: [
-            "Name the hardest invariant",
-            "Name the hottest path",
-            "Name the acceptable degradation",
-          ],
-        },
-        {
-          title: "Infrastructure prompts need operators",
-          paragraphs: [
-            "Schedulers, caches, gateways, metrics systems, and feature flags are judged through control/data plane separation, propagation behavior, tenant isolation, and operational safety.",
-          ],
-          bullets: [
-            "Configuration rollout needs versions and rollback",
-            "Control plane outage should not always stop data plane",
-            "Think about cardinality and noisy neighbors",
-          ],
-        },
-        {
-          title: "AI prompts combine familiar patterns",
-          paragraphs: [
-            "LLM chat adds expensive streaming compute to messaging. Coding agents add long-running job orchestration and sandboxed tools. RAG adds search indexing, ACLs, and grounded generation. Inference APIs add admission and GPU scheduling.",
-          ],
-          bullets: [
-            "Reuse known primitives; emphasize new failure modes",
-            "Separate model quality from system reliability",
-            "Close with evals and cost",
-          ],
-        },
-      ],
+      lessons: systemDesignLessons[13],
       seniorSignal:
         "Begin by saying what family the prompt belongs to and which two hard parts you will prioritize. That establishes a crisp interview agenda.",
       pitfalls: [
@@ -1459,41 +1022,7 @@ export const systemDesign: Course = {
           { label: "Trigger", detail: "When to revisit" },
         ],
       },
-      lessons: [
-        {
-          title: "Use the FACT frame",
-          paragraphs: [
-            "Frame constraints, Alternatives, Consequences, Take a position. Compare on the few dimensions that matter: correctness, latency, scale, complexity, cost, and organizational fit.",
-          ],
-          bullets: [
-            "Reject false binaries; hybrids are valid when justified",
-            "Do not hide operational cost",
-            "Say which requirement dominates",
-          ],
-        },
-        {
-          title: "Optimize for the current horizon",
-          paragraphs: [
-            "The simplest architecture that meets projected scale is usually strongest. Preserve seams for growth, but do not pay distributed-system costs before they buy something.",
-          ],
-          bullets: [
-            "Scale estimates define the horizon",
-            "Operational familiarity is a valid factor",
-            "Migration triggers make simplicity credible",
-          ],
-        },
-        {
-          title: "Defend without rigidity",
-          paragraphs: [
-            "When challenged, restate the changed assumption and update the choice. A revised design is good reasoning, not failure. Keep the invariant stable even if mechanism changes.",
-          ],
-          bullets: [
-            "Ask what constraint the interviewer is changing",
-            "Separate preference from requirement",
-            "Name the downside of your own choice first",
-          ],
-        },
-      ],
+      lessons: systemDesignLessons[14],
       seniorSignal:
         "Answer ‘why X?’ in 45 seconds: criteria, 2 alternatives, decision, drawback, trigger. Concision signals command.",
       pitfalls: [
@@ -1569,41 +1098,7 @@ export const systemDesign: Course = {
           { label: "40–50", detail: "Failure + close" },
         ],
       },
-      lessons: [
-        {
-          title: "Drive a shared agenda",
-          paragraphs: [
-            "Restate the problem, ask architecture-changing questions, state assumptions, estimate scale, and propose the two areas worth deeper attention. Tell the interviewer how you plan to spend time and invite correction.",
-          ],
-          bullets: [
-            "Keep a visible requirements/SLO list",
-            "Use named arrows and numbered request flows",
-            "Pause for steering at phase boundaries",
-          ],
-        },
-        {
-          title: "Narrate decisions, not drawing",
-          paragraphs: [
-            "Instead of ‘then add Redis,’ say ‘reads outnumber writes 100:1 and allow 30 seconds of staleness, so a regional cache removes primary load; here is invalidation and failure behavior.’",
-          ],
-          bullets: [
-            "Mechanism follows constraint",
-            "Every component gets an owner and failure mode",
-            "Revisit estimates at bottlenecks",
-          ],
-        },
-        {
-          title: "Recover like a senior engineer",
-          paragraphs: [
-            "When a flaw appears, acknowledge it precisely, preserve the product invariant, and change the smallest necessary part. Explain migration or reconciliation if data/state already exists.",
-          ],
-          bullets: [
-            "Do not erase the whole design reflexively",
-            "State what remains valid",
-            "Close with risks, metrics, and next experiment",
-          ],
-        },
-      ],
+      lessons: systemDesignLessons[15],
       seniorSignal:
         "Treat the interview as a design review with a colleague. Use decisive language, expose uncertainty honestly, and make it easy for them to push you deeper.",
       pitfalls: [

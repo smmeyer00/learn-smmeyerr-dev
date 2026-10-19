@@ -5,9 +5,17 @@ import {
   migrateProgress,
   chapterKey,
   isChapterComplete,
+  hasProgressData,
+  importProgressJson,
 } from "../lib/progress";
 import { searchEntries, buildSearchIndex } from "../lib/search";
 import { drawScenario, prng } from "../content/drills";
+import { guidedExercises } from "../content/guided-exercises";
+import {
+  newGuidedDraft, canCompare, canRevise, makeGuidedAttempt, calculationChecks,
+  exerciseFeedback, guidedReviewState, GUIDED_REVIEW_DELAY_MS,
+  readExerciseNumber, migrateGuidedExercises, validGuidedImport,
+} from "../lib/guided-practice";
 import {
   chapterReviewQueue,
   nextIncompleteChapter,
@@ -112,6 +120,93 @@ describe("drill draws", () => {
       const v = rand();
       assert.ok(v >= 0 && v < 1);
     }
+  });
+});
+
+describe("guided practice", () => {
+  const exercise = guidedExercises[0];
+  function filledDraft() {
+    const draft = newGuidedDraft(1);
+    draft.stage = "attempt";
+    draft.answers = Object.fromEntries(exercise.fields.map((field) =>
+      [field.id, field.check ? String(field.check.expected) : "My attempted reasoning."]));
+    return draft;
+  }
+  function assessedDraft() {
+    const draft = filledDraft();
+    draft.firstAttempt = { ...draft.answers };
+    draft.stage = "revise";
+    draft.ratings = Object.fromEntries(exercise.rubric.map((criterion) => [criterion.id, "meets" as const]));
+    draft.evidence = Object.fromEntries(exercise.rubric.map((criterion) => [criterion.id, "Specific evidence in my first attempt."]));
+    draft.revision = "I added a finite wait and explicit overload response.";
+    return draft;
+  }
+
+  it("requires an attempt for each field and evidence for each self-assessment", () => {
+    const draft = newGuidedDraft(1);
+    assert.equal(canCompare(exercise, draft), false);
+    draft.answers = filledDraft().answers;
+    assert.equal(canCompare(exercise, draft), true);
+    draft.answers.timeline = "   ";
+    assert.equal(canCompare(exercise, draft), false);
+    const assessed = assessedDraft();
+    assert.equal(canRevise(exercise, assessed), true);
+    assessed.evidence.freshness = "";
+    assert.equal(canRevise(exercise, assessed), false);
+    assert.equal(makeGuidedAttempt(exercise, assessed, "2026-10-18T12:00:00Z"), null);
+  });
+
+  it("checks known arithmetic and refuses partial numeric parses", () => {
+    assert.equal(readExerciseNumber("10,000"), 10000);
+    assert.equal(readExerciseNumber(" 500.00 "), 500);
+    for (const invalid of ["", "500 RPS", "5,00", "Infinity", "not sure"]) {
+      assert.equal(readExerciseNumber(invalid), null);
+    }
+    const draft = filledDraft();
+    assert.ok(calculationChecks(exercise, draft).every((check) => check.correct));
+    draft.answers["expiry-arrivals"] = "6000";
+    assert.equal(calculationChecks(exercise, draft).find((check) => check.id === "expiry-arrivals")?.correct, false);
+  });
+
+  it("does not let a high self-rating hide failed arithmetic or mutate the first attempt", () => {
+    const draft = assessedDraft();
+    draft.firstAttempt!["normal-source"] = "50";
+    draft.answers["normal-source"] = "500";
+    assert.equal(exerciseFeedback(exercise, draft).gaps[0].id, "load");
+    const attempt = makeGuidedAttempt(exercise, draft, "2026-10-18T12:00:00Z")!;
+    assert.equal(attempt.needsPractice, true);
+    assert.equal(attempt.firstAttempt!["normal-source"], "50");
+    assert.equal(attempt.revision, draft.revision);
+  });
+
+  it("keeps weak practice immediate and schedules a successful review at exactly 48 hours", () => {
+    const date = "2026-10-18T12:00:00Z";
+    const now = Date.parse(date);
+    const attempt = makeGuidedAttempt(exercise, assessedDraft(), date)!;
+    const state = { draft: attempt, attempts: [attempt] };
+    assert.equal(guidedReviewState(exercise, { draft: newGuidedDraft(1), attempts: [] }, now), "new");
+    assert.equal(guidedReviewState(exercise, state, now + GUIDED_REVIEW_DELAY_MS - 1), "fresh");
+    assert.equal(guidedReviewState(exercise, state, now + GUIDED_REVIEW_DELAY_MS), "due");
+    state.attempts[0] = { ...attempt, needsPractice: true };
+    assert.equal(guidedReviewState(exercise, state, now), "weak");
+  });
+
+  it("migrates old progress and rejects malformed/future guided work at import", () => {
+    const old = migrateProgress({ schemaVersion: 1, completedChapters: ["systems/one"] });
+    assert.deepEqual(old.guidedExercises, {});
+    assert.deepEqual(old.completedChapters, ["systems/one"]);
+    const draft = filledDraft();
+    const raw = { "cache-expiry": { draft, attempts: [] } };
+    assert.equal(validGuidedImport(raw), true);
+    assert.deepEqual(migrateGuidedExercises(raw)["cache-expiry"].draft.answers, draft.answers);
+    assert.equal(validGuidedImport({ "cache-expiry": { draft: { ...draft, version: 2 }, attempts: [] } }), false);
+    assert.equal(validGuidedImport({ "cache-expiry": { draft: { ...draft, answers: [] }, attempts: [] } }), false);
+    assert.deepEqual(migrateGuidedExercises({ bad: { draft: null } }), {});
+    const attempt = makeGuidedAttempt(exercise, assessedDraft(), "2026-10-18T12:00:00Z")!;
+    const state = { ...defaultProgress(), guidedExercises: { "cache-expiry": { draft: attempt, attempts: [attempt] } } };
+    assert.equal(hasProgressData(state), true);
+    assert.deepEqual(migrateProgress(JSON.parse(JSON.stringify(state))).guidedExercises, state.guidedExercises);
+    assert.equal(importProgressJson(JSON.stringify({ ...state, guidedExercises: { "cache-expiry": { draft: { version: 2 } } } })).ok, false);
   });
 });
 
